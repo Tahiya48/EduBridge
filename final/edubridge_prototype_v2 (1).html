@@ -1,0 +1,2512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduBridge – Low Income Student Support Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0C1A2E;
+    --ink2: #162542;
+    --ink3: #1D2F50;
+    --ink4: #0A1525;
+    --card: #1A2E4E;
+    --teal: #0EC8B0;
+    --teal2: #6EE7D8;
+    --teal-dim: rgba(14,200,176,0.12);
+    --amber: #F5A623;
+    --amber2: #F7C26B;
+    --sky: #38BDF8;
+    --emerald: #34D399;
+    --rose: #FB7185;
+    --violet: #A78BFA;
+    --slate: #94A3B8;
+    --muted: #4A6A8A;
+    --border: #243D5E;
+    --font-display: 'Fraunces', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #050C18;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(14,200,176,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(56,189,248,0.04) 0%, transparent 50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    font-family: var(--font-body);
+    padding: 28px 16px 48px;
+    gap: 0;
+  }
+
+  /* ─── OUTER CHROME ─── */
+  .app-title {
+    font-family: var(--font-display);
+    color: var(--teal);
+    font-size: 24px;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .app-subtitle {
+    color: var(--muted);
+    font-size: 11px;
+    margin-bottom: 22px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+  }
+
+  /* ─── PHONE SHELL ─── */
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--ink);
+    border-radius: 48px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 10px #111,
+      0 0 0 12px #1e1e1e,
+      0 50px 100px rgba(0,0,0,0.9),
+      0 0 80px rgba(14,200,176,0.06);
+    flex-shrink: 0;
+  }
+
+  /* Dynamic island */
+  .phone::before {
+    content: '';
+    position: absolute;
+    top: 12px; left: 50%;
+    transform: translateX(-50%);
+    width: 110px; height: 30px;
+    background: #0a0a0a;
+    border-radius: 15px;
+    z-index: 100;
+  }
+
+  /* ─── SCREENS ─── */
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    background: linear-gradient(160deg, var(--ink) 0%, var(--ink2) 100%);
+    animation: slideIn 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+  .screen.active { display: flex; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── STATUS BAR ─── */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 52px 24px 0;
+    flex-shrink: 0;
+  }
+  .status-bar span { color: var(--slate); font-size: 12px; font-weight: 500; }
+
+  /* ─── SCROLLABLE CONTENT ─── */
+  .scroll-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 84px;
+    scrollbar-width: none;
+  }
+  .scroll-content::-webkit-scrollbar { display: none; }
+
+  /* ─── BOTTOM NAV ─── */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 76px;
+    background: rgba(10,21,37,0.96);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 4px 10px;
+    z-index: 50;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 14px;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .nav-item span:first-child { font-size: 20px; }
+  .nav-item span:last-child { font-size: 9px; color: var(--muted); font-weight: 600; letter-spacing: 0.3px; }
+  .nav-item.active span:last-child { color: var(--teal); }
+  .nav-item.active span:first-child { filter: drop-shadow(0 0 6px var(--teal)); }
+  .nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px;
+    background: var(--teal);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--teal);
+  }
+  .nav-item:hover { background: rgba(14,200,176,0.06); }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: linear-gradient(160deg, var(--ink3) 0%, var(--ink4) 100%);
+    padding: 10px 20px 16px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--teal), transparent);
+    opacity: 0.35;
+  }
+  .header-sub { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+  .header-title { color: #fff; font-family: var(--font-display); font-size: 24px; line-height: 1.1; }
+  .header-row { display: flex; align-items: center; justify-content: space-between; }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--ink3);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.5); border-color: rgba(14,200,176,0.25); }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none;
+    border-radius: 12px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary {
+    background: linear-gradient(90deg, var(--teal), var(--teal2));
+    color: var(--ink);
+    padding: 14px;
+    width: 100%;
+    font-size: 14px;
+    border-radius: 14px;
+    box-shadow: 0 0 24px rgba(14,200,176,0.3);
+  }
+  .btn-primary:hover { box-shadow: 0 0 36px rgba(14,200,176,0.5); transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    border: 1.5px solid var(--teal);
+    color: var(--teal);
+    padding: 14px;
+    width: 100%;
+    font-size: 14px;
+    border-radius: 14px;
+  }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid;
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+  .btn-sm {
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+
+  /* ─── FORM ELEMENTS ─── */
+  .input-group { margin-bottom: 16px; }
+  .input-label {
+    display: block;
+    color: var(--slate);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+  .input-field {
+    width: 100%;
+    background: var(--ink4);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 16px 13px 44px;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .input-field:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(14,200,176,0.1); }
+  .input-wrapper { position: relative; }
+  .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
+
+  /* ─── BADGES ─── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+  }
+  .badge-teal   { background: rgba(14,200,176,0.15);  color: var(--teal); }
+  .badge-amber  { background: rgba(245,166,35,0.15);  color: var(--amber); }
+  .badge-sky    { background: rgba(56,189,248,0.15);  color: var(--sky); }
+  .badge-green  { background: rgba(52,211,153,0.15);  color: var(--emerald); }
+  .badge-rose   { background: rgba(251,113,133,0.15); color: var(--rose); }
+  .badge-violet { background: rgba(167,139,250,0.15); color: var(--violet); }
+  .badge-gray   { background: rgba(148,163,184,0.12); color: var(--slate); }
+
+  /* ─── PROGRESS BAR ─── */
+  .progress-track { background: var(--ink4); border-radius: 4px; height: 6px; overflow: hidden; margin: 6px 0; }
+  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+
+  /* ─── CHIPS ─── */
+  .chip-row { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .chip-row::-webkit-scrollbar { display: none; }
+  .chip {
+    padding: 7px 16px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; cursor: pointer;
+    white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
+  }
+  .chip-active { background: var(--teal); color: var(--ink); }
+  .chip-inactive { background: var(--ink3); border: 1px solid var(--border); color: var(--slate); }
+  .chip-inactive:hover { border-color: var(--teal); color: var(--teal); }
+
+  /* ─── DIVIDER ─── */
+  .divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .divider span { color: var(--muted); font-size: 11px; }
+
+  /* ─── STAT GRID ─── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 16px; margin-bottom: 16px; }
+  .stat-box {
+    background: var(--ink3); border: 1px solid var(--border);
+    border-radius: 14px; padding: 10px 8px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .stat-box::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
+  .stat-label { font-size: 8px; color: var(--muted); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px; }
+  .stat-value { font-size: 20px; font-weight: 700; color: #fff; }
+  .stat-sub { font-size: 8px; color: var(--muted); margin-top: 2px; }
+
+  /* ─── SEARCH BAR ─── */
+  .search-bar { display: flex; gap: 8px; padding: 12px 16px; }
+  .search-input-wrap { flex: 1; position: relative; }
+  .search-input {
+    width: 100%; background: var(--ink3);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 16px 12px 44px;
+    color: #fff; font-family: var(--font-body); font-size: 13px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--teal); }
+  .search-input::placeholder { color: var(--muted); }
+  .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; }
+
+  /* ─── ONLINE/OFFLINE DOT ─── */
+  .online-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 7px var(--emerald); flex-shrink: 0; }
+  .offline-dot { width: 10px; height: 10px; border-radius: 50%; background: #555; flex-shrink: 0; }
+
+  /* ─── SECTION TITLE ─── */
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 17px; color: #fff;
+    padding: 0 16px; margin-bottom: 10px; margin-top: 18px;
+  }
+
+  /* ─── NOTIF BADGE ─── */
+  .notif-badge {
+    position: absolute; top: -4px; right: -4px;
+    width: 18px; height: 18px;
+    background: var(--rose); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700; color: white;
+  }
+
+  /* ─── SCHOLARSHIP CARD ─── */
+  .schol-card {
+    background: var(--ink3); border: 1px solid var(--border);
+    border-radius: 18px; padding: 16px 16px 16px 20px;
+    margin: 0 16px 12px; cursor: pointer;
+    transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .schol-card:hover { transform: translateY(-3px); box-shadow: 0 14px 32px rgba(0,0,0,0.5); border-color: rgba(14,200,176,0.3); }
+  .schol-accent { position: absolute; left: 0; top: 0; bottom: 0; width: 5px; border-radius: 18px 0 0 18px; }
+
+  /* ─── TRACKER CARD ─── */
+  .tracker-card {
+    background: var(--ink3); border-radius: 18px;
+    padding: 16px 16px 16px 20px; margin: 0 16px 12px;
+    position: relative; overflow: hidden;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tracker-card:hover { transform: translateY(-2px); }
+
+  /* ─── STEP ROW ─── */
+  .step-row { display: flex; align-items: center; margin-top: 10px; }
+  .step-dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700; flex-shrink: 0;
+  }
+  .step-line { flex: 1; height: 2px; }
+  .step-labels { display: flex; justify-content: space-between; margin-top: 4px; }
+  .step-label { font-size: 8px; color: var(--muted); font-weight: 600; letter-spacing: 0.3px; }
+
+  /* ─── MENTOR CARD ─── */
+  .mentor-card {
+    background: var(--ink3); border: 1px solid var(--border);
+    border-radius: 18px; padding: 16px; margin: 0 16px 12px;
+    display: flex; gap: 12px; align-items: flex-start;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .mentor-card:hover { transform: translateY(-2px); border-color: rgba(52,211,153,0.3); box-shadow: 0 10px 28px rgba(0,0,0,0.4); }
+
+  /* ─── RESOURCE CARD ─── */
+  .resource-card {
+    background: var(--ink3); border: 1px solid var(--border);
+    border-radius: 16px; padding: 14px 16px; margin: 0 16px 10px;
+    display: flex; gap: 12px; align-items: center;
+    transition: all 0.2s; cursor: pointer;
+  }
+  .resource-card:hover { border-color: rgba(167,139,250,0.35); transform: translateY(-1px); }
+  .file-icon {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; flex-shrink: 0; gap: 1px;
+  }
+  .file-type-label { font-size: 8px; font-weight: 800; letter-spacing: 0.5px; }
+
+  /* ─── UPLOAD ZONE ─── */
+  .upload-zone {
+    background: rgba(167,139,250,0.06);
+    border: 2px dashed rgba(167,139,250,0.35);
+    border-radius: 18px; padding: 28px;
+    text-align: center; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .upload-zone:hover { background: rgba(167,139,250,0.1); border-color: var(--violet); }
+
+  /* ─── ADMIN CARD ─── */
+  .admin-card {
+    background: var(--ink3); border: 1px solid var(--border);
+    border-radius: 16px; padding: 14px 16px; margin: 0 16px 10px;
+    display: flex; align-items: center; gap: 12px; cursor: pointer;
+    transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .admin-card:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .admin-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+
+  /* ─── AUTH TAB ─── */
+  .auth-tabs { display: flex; background: var(--ink3); border-radius: 24px; padding: 4px; margin: 0 16px 22px; }
+  .auth-tab {
+    flex: 1; padding: 10px; border-radius: 20px; text-align: center;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: all 0.25s; color: var(--muted);
+  }
+  .auth-tab.active {
+    background: linear-gradient(90deg, var(--teal), var(--teal2));
+    color: var(--ink); box-shadow: 0 4px 14px rgba(14,200,176,0.3);
+  }
+
+  /* ─── SOCIAL BUTTONS ─── */
+  .social-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 16px; }
+  .social-btn {
+    background: var(--ink4); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 12px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    color: var(--slate); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; font-family: var(--font-body);
+  }
+  .social-btn:hover { border-color: var(--teal); color: #fff; }
+
+  /* ─── ACTION GRID ─── */
+  .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px; margin-bottom: 4px; }
+  .action-card {
+    background: var(--ink3); border: 1px solid var(--border);
+    border-radius: 18px; padding: 16px 14px;
+    cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .action-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,0.5); }
+  .action-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 18px 18px 0 0; }
+  .action-icon { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 10px; }
+  .action-title { color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 3px; line-height: 1.2; }
+  .action-sub { color: var(--muted); font-size: 10px; font-weight: 500; }
+
+  /* ─── SCREEN NAV BUTTONS ─── */
+  .screen-nav-bar {
+    display: flex; gap: 6px; padding: 14px 16px;
+    background: transparent; flex-wrap: wrap;
+    justify-content: center; width: 100%; margin-bottom: 18px;
+  }
+  .screen-btn {
+    padding: 7px 12px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; font-family: var(--font-body);
+    cursor: pointer; border: none; transition: all 0.2s;
+    background: rgba(22,37,66,0.8); color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .screen-btn.active { background: var(--teal); color: var(--ink); border-color: var(--teal); }
+  .screen-btn:hover:not(.active) { background: var(--ink3); color: #fff; }
+
+  /* ─── AVATAR ─── */
+  .avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+
+  /* ─── HERO BANNER (dashboard) ─── */
+  .hero-banner {
+    margin: 14px 16px 0;
+    background: linear-gradient(135deg, rgba(14,200,176,0.18) 0%, rgba(56,189,248,0.08) 100%);
+    border: 1px solid rgba(14,200,176,0.3);
+    border-radius: 22px; padding: 20px;
+    position: relative; overflow: hidden;
+  }
+  .hero-banner::before {
+    content: ''; position: absolute; top: -30px; right: -30px;
+    width: 130px; height: 130px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(14,200,176,0.15), transparent);
+    pointer-events: none;
+  }
+
+  /* ─── STEP PILL ─── */
+  .step-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--ink4); border-radius: 12px; padding: 10px 14px;
+    margin-bottom: 10px; cursor: pointer; transition: all 0.2s;
+  }
+  .step-pill:hover { border-color: var(--teal); }
+  .step-pill-num {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+  }
+  
+  /* ─── RADIO ROLE SELECT ─── */
+  .role-select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .role-opt {
+    background: var(--ink3); border: 2px solid var(--border);
+    border-radius: 14px; padding: 16px 12px; text-align: center;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .role-opt.selected { border-color: var(--teal); background: rgba(14,200,176,0.1); }
+  .role-opt:hover { border-color: var(--teal); }
+
+  /* ─── MENTOR DASHBOARD CARD ─── */
+  .request-card {
+    background: var(--ink3); border: 1px solid var(--border);
+    border-radius: 16px; padding: 14px 16px; margin: 0 16px 10px;
+    transition: all 0.2s;
+  }
+  .request-card:hover { border-color: rgba(14,200,176,0.3); }
+</style>
+</head>
+<body>
+
+<!-- ─── Top title ─── -->
+<div style="text-align:center">
+  <div class="app-title">EduBridge</div>
+  <div class="app-subtitle">Low Income Student Support Platform</div>
+</div>
+
+<!-- ─── Screen Nav ─── -->
+<div class="screen-nav-bar" id="screenNav">
+  <button class="screen-btn active" onclick="showScreen('login')">1. Login</button>
+  <button class="screen-btn" onclick="showScreen('register')">2. Register</button>
+  <button class="screen-btn" onclick="showScreen('dashboard')">3. Dashboard</button>
+  <button class="screen-btn" onclick="showScreen('scholarships')">4. Scholarships</button>
+  <button class="screen-btn" onclick="showScreen('schol-detail')">5. Details</button>
+  <button class="screen-btn" onclick="showScreen('apply')">6. Apply</button>
+  <button class="screen-btn" onclick="showScreen('tracker')">7. Tracker</button>
+  <button class="screen-btn" onclick="showScreen('resources')">8. Resources</button>
+  <button class="screen-btn" onclick="showScreen('mentor')">9. Mentor</button>
+  <button class="screen-btn" onclick="showScreen('mentor-profile')">9b. Mentor Profile</button>
+  <button class="screen-btn" onclick="showScreen('mentor-dash')">10. Mentor Dash</button>
+  <button class="screen-btn" onclick="showScreen('admin')">11. Admin</button>
+</div>
+
+<!-- ─── PHONE ─── -->
+<div class="phone">
+
+  <!-- ════════════════════════════════
+       SCREEN 1 · LOGIN
+  ════════════════════════════════ -->
+  <div class="screen active" id="screen-login">
+    <div style="position:absolute;top:80px;right:20px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(14,200,176,0.07),transparent);pointer-events:none"></div>
+    <div style="position:absolute;bottom:140px;left:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,0.05),transparent);pointer-events:none"></div>
+
+    <div class="status-bar"><span>9:41</span><span>●●● 🔋</span></div>
+
+    <div class="scroll-content" style="padding:0 0 20px">
+      <div style="text-align:center;padding:24px 0 30px">
+        <div style="width:76px;height:76px;border-radius:24px;background:linear-gradient(135deg,rgba(14,200,176,0.25),rgba(56,189,248,0.1));display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 0 36px rgba(14,200,176,0.2);border:1px solid rgba(14,200,176,0.3)">
+          <span style="font-size:34px">🎓</span>
+        </div>
+        <div style="font-family:var(--font-display);font-size:28px;color:#fff;margin-bottom:4px">EduBridge</div>
+        <div style="color:var(--muted);font-size:11px;letter-spacing:2.5px;text-transform:uppercase">Student Support Platform</div>
+      </div>
+
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="loginTab" onclick="switchTab('login')">Sign In</div>
+        <div class="auth-tab" id="registerTabLink" onclick="showScreen('register')">Register</div>
+      </div>
+
+      <div style="padding:0 16px">
+        <div class="input-group">
+          <label class="input-label">Email Address</label>
+          <div class="input-wrapper">
+            <span class="input-icon">✉️</span>
+            <input id="login-email" class="input-field" type="email" placeholder="you@university.edu.my" value="ahmad@um.edu.my">
+          </div>
+          <div id="login-email-err" style="color:var(--rose);font-size:11px;margin-top:5px;display:none">⚠ Please enter a valid email address.</div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Password</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔒</span>
+            <input id="login-password" class="input-field" type="password" placeholder="Min 8 characters" value="correct123">
+          </div>
+          <div id="login-pw-err" style="color:var(--rose);font-size:11px;margin-top:5px;display:none">⚠ Incorrect password. Please try again.</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="checkbox" checked style="accent-color:var(--teal);width:14px;height:14px">
+            <span style="color:var(--slate);font-size:12px">Remember me</span>
+          </label>
+          <span style="color:var(--teal);font-size:12px;font-weight:600;cursor:pointer">Forgot Password?</span>
+        </div>
+        <button class="btn btn-primary" onclick="handleLogin()">SIGN IN →</button>
+
+        <div style="text-align:center;margin:14px 0;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:1px">— OR CONTINUE WITH —</div>
+      </div>
+
+      <div class="social-row">
+        <button class="social-btn">G&nbsp; Google</button>
+        <button class="social-btn">f&nbsp; Facebook</button>
+      </div>
+
+      <div style="text-align:center;margin-top:22px;color:var(--muted);font-size:13px">
+        Don't have an account? <span style="color:var(--teal);font-weight:700;cursor:pointer" onclick="showScreen('register')">Register Free</span>
+      </div>
+
+      <div style="margin:20px 16px 0;padding:14px;background:rgba(14,200,176,0.06);border:1px solid rgba(14,200,176,0.2);border-radius:14px">
+        <div style="color:var(--teal);font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:6px">DEMO LOGINS</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span onclick="showScreen('dashboard')" style="background:rgba(14,200,176,0.1);color:var(--teal);font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(14,200,176,0.3)">🎓 Student</span>
+          <span onclick="showScreen('mentor-dash')" style="background:rgba(52,211,153,0.1);color:var(--emerald);font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(52,211,153,0.3)">🤝 Mentor</span>
+          <span onclick="showScreen('admin')" style="background:rgba(251,113,133,0.1);color:var(--rose);font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(251,113,133,0.3)">⚙️ Admin</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       SCREEN 2 · REGISTER
+  ════════════════════════════════ -->
+  <div class="screen" id="screen-register">
+    <div class="status-bar"><span>9:41</span><span>●●● 🔋</span></div>
+
+    <div class="scroll-content" style="padding:0 0 20px">
+      <div style="padding:16px 20px 20px">
+        <button onclick="showScreen('login')" style="background:var(--ink3);border:none;width:36px;height:36px;border-radius:50%;color:var(--slate);font-size:16px;cursor:pointer;margin-bottom:16px">←</button>
+        <div style="font-family:var(--font-display);font-size:26px;color:#fff;margin-bottom:4px">Create Account</div>
+        <div style="color:var(--muted);font-size:13px">Join EduBridge and unlock your future</div>
+      </div>
+
+      <div style="padding:0 16px">
+        <div class="input-group">
+          <label class="input-label">Full Name</label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input id="reg-name" class="input-field" type="text" placeholder="Ahmad Raheel">
+          </div>
+          <div id="reg-name-err" style="color:var(--rose);font-size:11px;margin-top:5px;display:none">⚠ Full name is required.</div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Email Address</label>
+          <div class="input-wrapper">
+            <span class="input-icon">✉️</span>
+            <input id="reg-email" class="input-field" type="email" placeholder="you@university.edu.my">
+          </div>
+          <div id="reg-email-err" style="color:var(--rose);font-size:11px;margin-top:5px;display:none">⚠ Please enter a valid email address.</div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Password</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔒</span>
+            <input id="reg-password" class="input-field" type="password" placeholder="Minimum 8 characters">
+          </div>
+          <div id="reg-pw-err" style="color:var(--rose);font-size:11px;margin-top:5px;display:none">⚠ Password must be at least 8 characters long.</div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Confirm Password</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔒</span>
+            <input id="reg-confirm" class="input-field" type="password" placeholder="Repeat password">
+          </div>
+          <div id="reg-confirm-err" style="color:var(--rose);font-size:11px;margin-top:5px;display:none">⚠ Passwords do not match.</div>
+        </div>
+
+        <div style="margin-bottom:22px">
+          <label class="input-label" style="margin-bottom:10px">I am registering as</label>
+          <div class="role-select-grid">
+            <div class="role-opt selected" id="role-student">
+              <div style="font-size:26px;margin-bottom:6px">🎓</div>
+              <div style="color:#fff;font-size:13px;font-weight:700">Student</div>
+              <div style="color:var(--muted);font-size:10px;margin-top:2px">Seeking support</div>
+            </div>
+            <div class="role-opt" id="role-mentor" onclick="toggleRole()">
+              <div style="font-size:26px;margin-bottom:6px">🤝</div>
+              <div style="color:var(--slate);font-size:13px;font-weight:700">Mentor</div>
+              <div style="color:var(--muted);font-size:10px;margin-top:2px">Offering guidance</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:22px">
+          <input type="checkbox" style="accent-color:var(--teal);width:14px;height:14px;margin-top:2px;flex-shrink:0">
+          <span style="color:var(--muted);font-size:12px;line-height:1.5">I agree to the <span style="color:var(--teal);font-weight:700">Terms of Service</span> and <span style="color:var(--teal);font-weight:700">Privacy Policy</span></span>
+        </div>
+
+        <button class="btn btn-primary" onclick="handleRegister()">CREATE ACCOUNT →</button>
+        <div style="text-align:center;margin-top:16px;color:var(--muted);font-size:13px">
+          Already have an account? <span style="color:var(--teal);font-weight:700;cursor:pointer" onclick="showScreen('login')">Sign In</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       SCREEN 3 · STUDENT DASHBOARD
+  ════════════════════════════════ -->
+  <div class="screen" id="screen-dashboard">
+    <div class="header" style="padding-top:52px">
+      <div class="header-row">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--sky));display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--ink);font-size:17px" id="dash-avatar-letter">A</div>
+          <div>
+            <div style="color:var(--muted);font-size:11px;font-weight:600">Welcome back 👋</div>
+            <div style="color:#fff;font-family:var(--font-display);font-size:18px" id="dash-name">Ahmad Raheel</div>
+          </div>
+        </div>
+        <div style="position:relative">
+          <div style="width:42px;height:42px;border-radius:50%;background:var(--ink3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer">🔔</div>
+          <div class="notif-badge">3</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-content">
+      <!-- Hero banner -->
+      <div class="hero-banner">
+        <div style="color:var(--teal);font-size:10px;font-weight:700;letter-spacing:1.5px;margin-bottom:6px;text-transform:uppercase">Profile Completion</div>
+        <div style="color:#fff;font-size:15px;font-weight:700;margin-bottom:10px">Complete your profile to unlock more scholarships</div>
+        <div class="progress-track" style="height:8px;margin-bottom:6px"><div class="progress-fill" style="width:72%;background:linear-gradient(90deg,var(--teal),var(--sky))"></div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:var(--muted);font-size:11px">72% complete</span>
+          <span style="color:var(--teal);font-size:11px;font-weight:700;cursor:pointer">Complete Now →</span>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:14px 16px 0">
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="color:var(--muted);font-size:9px;font-weight:700;letter-spacing:0.8px;margin-bottom:4px">APPLICATIONS</div>
+          <div style="font-size:26px;font-weight:800;color:var(--amber)">4</div>
+          <span class="badge badge-green" style="font-size:9px">Active</span>
+        </div>
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="color:var(--muted);font-size:9px;font-weight:700;letter-spacing:0.8px;margin-bottom:4px">SCHOLARSHIPS</div>
+          <div style="font-size:26px;font-weight:800;color:var(--sky)">12</div>
+          <span style="color:var(--muted);font-size:9px">Available</span>
+        </div>
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="color:var(--muted);font-size:9px;font-weight:700;letter-spacing:0.8px;margin-bottom:4px">MENTORS</div>
+          <div style="font-size:26px;font-weight:800;color:var(--emerald)">8</div>
+          <span style="color:var(--emerald);font-size:9px">Online</span>
+        </div>
+      </div>
+
+      <div class="section-title">Quick Actions</div>
+
+      <div class="action-grid">
+        <div class="action-card" onclick="showScreen('scholarships')" style="--c:var(--teal)">
+          <style>
+            .action-card:nth-child(1)::before{background:var(--teal)}
+            .action-card:nth-child(2)::before{background:var(--sky)}
+            .action-card:nth-child(3)::before{background:var(--emerald)}
+            .action-card:nth-child(4)::before{background:var(--violet)}
+          </style>
+          <div class="action-icon" style="background:rgba(14,200,176,0.12)">🎓</div>
+          <div class="action-title">Browse Scholarships</div>
+          <div class="action-sub">12 new listings</div>
+        </div>
+        <div class="action-card" onclick="showScreen('tracker')">
+          <div class="action-icon" style="background:rgba(56,189,248,0.12)">📋</div>
+          <div class="action-title">My Applications</div>
+          <div class="action-sub">4 in progress</div>
+        </div>
+        <div class="action-card" onclick="showScreen('mentor')">
+          <div class="action-icon" style="background:rgba(52,211,153,0.12)">🤝</div>
+          <div class="action-title">Find a Mentor</div>
+          <div class="action-sub">8 mentors online</div>
+        </div>
+        <div class="action-card" onclick="showScreen('resources')">
+          <div class="action-icon" style="background:rgba(167,139,250,0.12)">📚</div>
+          <div class="action-title">Study Resources</div>
+          <div class="action-sub">240+ materials</div>
+        </div>
+      </div>
+
+      <div class="section-title">Upcoming Deadlines</div>
+      <div style="padding:0 16px;display:flex;flex-direction:column;gap:10px">
+        <div class="card" style="display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer" onclick="showScreen('schol-detail')">
+          <div style="width:40px;height:40px;border-radius:12px;background:rgba(251,113,133,0.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⏰</div>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:13px;font-weight:700">National Merit Scholarship</div>
+            <div style="color:var(--rose);font-size:11px;font-weight:600">⚠ Deadline: Mar 31 · 22 days left</div>
+          </div>
+          <span class="badge badge-rose">Urgent</span>
+        </div>
+        <div class="card" style="display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer">
+          <div style="width:40px;height:40px;border-radius:12px;background:rgba(245,166,35,0.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📅</div>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:13px;font-weight:700">Yayasan Telekom Scholarship</div>
+            <div style="color:var(--amber);font-size:11px">Deadline: Apr 15 · 37 days left</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">Recent Activity</div>
+      <div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px">
+        <div class="card" style="display:flex;align-items:center;gap:12px;padding:12px 14px">
+          <div style="width:32px;height:32px;border-radius:50%;background:rgba(52,211,153,0.12);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">✓</div>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:12px;font-weight:600">Khazanah Scholarship Approved</div>
+            <div style="color:var(--muted);font-size:10px">2 days ago</div>
+          </div>
+          <span class="badge badge-green">Approved</span>
+        </div>
+        <div class="card" style="display:flex;align-items:center;gap:12px;padding:12px 14px">
+          <div style="width:32px;height:32px;border-radius:50%;background:rgba(14,200,176,0.12);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">🤝</div>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:12px;font-weight:600">Dr. Sarah accepted your request</div>
+            <div style="color:var(--muted);font-size:10px">5 days ago</div>
+          </div>
+          <span class="badge badge-teal">Active</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active" onclick="showScreen('dashboard')"><span>🏠</span><span>Home</span></div>
+      <div class="nav-item" onclick="showScreen('scholarships')"><span>🎓</span><span>Scholarships</span></div>
+      <div class="nav-item" onclick="showScreen('tracker')"><span>📋</span><span>Track</span></div>
+      <div class="nav-item" onclick="showScreen('resources')"><span>📚</span><span>Resources</span></div>
+      <div class="nav-item" onclick="showScreen('mentor')"><span>🤝</span><span>Mentors</span></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       SCREEN 4 · SCHOLARSHIP LISTING
+  ════════════════════════════════ -->
+  <div class="screen" id="screen-scholarships">
+    <div class="header" style="padding-top:52px">
+      <div class="header-row">
+        <div>
+          <div class="header-sub">Opportunities</div>
+          <div class="header-title">Scholarships</div>
+        </div>
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--ink3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">⚙️</div>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" type="text" placeholder="Search scholarships...">
+      </div>
+      <button style="background:linear-gradient(90deg,var(--teal),var(--sky));border:none;border-radius:14px;width:48px;cursor:pointer;font-size:18px" onclick="">🎯</button>
+    </div>
+
+    <div style="padding:0 16px 10px">
+      <div class="chip-row">
+        <div class="chip chip-active">All</div>
+        <div class="chip chip-inactive">Government</div>
+        <div class="chip chip-inactive">Private</div>
+        <div class="chip chip-inactive">STEM</div>
+        <div class="chip chip-inactive">Arts</div>
+        <div class="chip chip-inactive">Medical</div>
+      </div>
+    </div>
+
+    <div style="padding:0 16px 8px;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:var(--muted);font-size:12px"><b style="color:var(--teal)">32</b> scholarships found</span>
+      <span style="color:var(--slate);font-size:11px;cursor:pointer">Sort: Deadline ▼</span>
+    </div>
+
+    <div class="scroll-content" style="padding-top:4px">
+      <!-- Scholarship 1 -->
+      <div class="schol-card" onclick="showScreen('schol-detail')">
+        <div class="schol-accent" style="background:var(--teal)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <div>
+            <div style="color:#fff;font-size:14px;font-weight:700;margin-bottom:2px">National Merit Scholarship</div>
+            <div style="color:var(--muted);font-size:11px">Ministry of Education · Malaysia</div>
+          </div>
+          <span class="badge badge-rose" style="flex-shrink:0">22 days</span>
+        </div>
+        <div style="color:var(--teal);font-size:22px;font-weight:800;margin-bottom:10px">RM 15,000 <span style="font-size:11px;color:var(--muted);font-weight:400">/year</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+          <span class="badge badge-sky">Government</span>
+          <span class="badge badge-gray">CGPA ≥ 3.5</span>
+          <span class="badge badge-gray">50 slots</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="progress-track" style="flex:1;margin-right:10px"><div class="progress-fill" style="width:68%;background:var(--teal)"></div></div>
+          <span style="color:var(--muted);font-size:10px;flex-shrink:0">68% quota filled</span>
+        </div>
+      </div>
+
+      <!-- Scholarship 2 -->
+      <div class="schol-card" onclick="showScreen('schol-detail')">
+        <div class="schol-accent" style="background:var(--amber)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <div>
+            <div style="color:#fff;font-size:14px;font-weight:700;margin-bottom:2px">Khazanah Global Scholars</div>
+            <div style="color:var(--muted);font-size:11px">Khazanah Nasional · Malaysia</div>
+          </div>
+          <span class="badge badge-amber" style="flex-shrink:0">37 days</span>
+        </div>
+        <div style="color:var(--amber);font-size:22px;font-weight:800;margin-bottom:10px">RM 25,000 <span style="font-size:11px;color:var(--muted);font-weight:400">/year</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="badge badge-amber">Private</span>
+          <span class="badge badge-gray">CGPA ≥ 3.7</span>
+          <span class="badge badge-gray">30 slots</span>
+        </div>
+      </div>
+
+      <!-- Scholarship 3 -->
+      <div class="schol-card">
+        <div class="schol-accent" style="background:var(--violet)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <div>
+            <div style="color:#fff;font-size:14px;font-weight:700;margin-bottom:2px">Yayasan Telekom Scholarship</div>
+            <div style="color:var(--muted);font-size:11px">Telekom Malaysia · STEM Focus</div>
+          </div>
+          <span class="badge badge-violet" style="flex-shrink:0">45 days</span>
+        </div>
+        <div style="color:var(--violet);font-size:22px;font-weight:800;margin-bottom:10px">RM 12,000 <span style="font-size:11px;color:var(--muted);font-weight:400">/year</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="badge badge-violet">STEM</span>
+          <span class="badge badge-gray">Income &lt; RM4K</span>
+        </div>
+      </div>
+
+      <!-- Scholarship 4 -->
+      <div class="schol-card">
+        <div class="schol-accent" style="background:var(--sky)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <div>
+            <div style="color:#fff;font-size:14px;font-weight:700;margin-bottom:2px">JPA Public Service Scholarship</div>
+            <div style="color:var(--muted);font-size:11px">Jabatan Perkhidmatan Awam</div>
+          </div>
+          <span class="badge badge-sky" style="flex-shrink:0">60 days</span>
+        </div>
+        <div style="color:var(--sky);font-size:22px;font-weight:800;margin-bottom:10px">Full Ride <span style="font-size:11px;color:var(--muted);font-weight:400">+ allowance</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="badge badge-sky">Government</span>
+          <span class="badge badge-gray">SPM 9A+</span>
+          <span class="badge badge-gray">100 slots</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="showScreen('dashboard')"><span>🏠</span><span>Home</span></div>
+      <div class="nav-item active"><span>🎓</span><span>Scholarships</span></div>
+      <div class="nav-item" onclick="showScreen('tracker')"><span>📋</span><span>Track</span></div>
+      <div class="nav-item" onclick="showScreen('resources')"><span>📚</span><span>Resources</span></div>
+      <div class="nav-item" onclick="showScreen('mentor')"><span>🤝</span><span>Mentors</span></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       SCREEN 5 · SCHOLARSHIP DETAILS
+  ════════════════════════════════ -->
+  <div class="screen" id="screen-schol-detail">
+    <!-- Hero header -->
+    <div style="background:linear-gradient(160deg,var(--ink3),var(--ink4));padding:52px 20px 20px;flex-shrink:0;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(14,200,176,0.1),transparent);pointer-events:none"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <button onclick="showScreen('scholarships')" style="background:rgba(255,255,255,0.08);border:none;width:36px;height:36px;border-radius:50%;color:#fff;font-size:16px;cursor:pointer">←</button>
+        <button style="background:rgba(14,200,176,0.12);border:1px solid rgba(14,200,176,0.3);width:36px;height:36px;border-radius:50%;color:var(--teal);font-size:16px;cursor:pointer">🔖</button>
+      </div>
+      <div style="text-align:center">
+        <div style="width:66px;height:66px;border-radius:20px;background:linear-gradient(135deg,rgba(14,200,176,0.2),rgba(56,189,248,0.1));display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:30px;border:1px solid rgba(14,200,176,0.3)">🏆</div>
+        <div style="font-family:var(--font-display);font-size:20px;color:#fff;margin-bottom:4px">National Merit Scholarship</div>
+        <div style="color:var(--muted);font-size:12px">Ministry of Education · Malaysia</div>
+      </div>
+    </div>
+
+    <div class="scroll-content">
+      <!-- Key Stats -->
+      <div style="padding:14px 16px 0">
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr">
+            <div style="padding:16px 10px;text-align:center;border-right:1px solid var(--border)">
+              <div style="color:var(--muted);font-size:9px;font-weight:700;letter-spacing:0.5px;margin-bottom:4px">AMOUNT</div>
+              <div style="color:var(--teal);font-size:16px;font-weight:800">RM 15K</div>
+              <div style="color:var(--muted);font-size:9px">per year</div>
+            </div>
+            <div style="padding:16px 10px;text-align:center;border-right:1px solid var(--border)">
+              <div style="color:var(--muted);font-size:9px;font-weight:700;letter-spacing:0.5px;margin-bottom:4px">DEADLINE</div>
+              <div style="color:var(--rose);font-size:14px;font-weight:800">Mar 31</div>
+              <div style="color:var(--rose);font-size:9px;font-weight:600">22 days left</div>
+            </div>
+            <div style="padding:16px 10px;text-align:center">
+              <div style="color:var(--muted);font-size:9px;font-weight:700;letter-spacing:0.5px;margin-bottom:4px">SLOTS</div>
+              <div style="color:var(--emerald);font-size:16px;font-weight:800">50</div>
+              <div style="color:var(--muted);font-size:9px">available</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div style="padding:14px 16px 0">
+        <div style="font-family:var(--font-display);font-size:16px;color:#fff;margin-bottom:8px">About this Scholarship</div>
+        <div class="card" style="padding:14px">
+          <p style="color:var(--slate);font-size:12px;line-height:1.7">The National Merit Scholarship supports outstanding students from low-income families to pursue higher education at any accredited Malaysian university. The award covers tuition fees, monthly living allowance, and annual book grants.</p>
+        </div>
+      </div>
+
+      <!-- Eligibility -->
+      <div style="padding:14px 16px 0">
+        <div style="font-family:var(--font-display);font-size:16px;color:#fff;margin-bottom:8px">Eligibility Criteria</div>
+        <div class="card" style="padding:14px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:22px;height:22px;border-radius:50%;background:rgba(52,211,153,0.15);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--emerald);flex-shrink:0">✓</div>
+            <span style="color:var(--slate);font-size:12px">Malaysian citizen, aged 18–25</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:22px;height:22px;border-radius:50%;background:rgba(52,211,153,0.15);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--emerald);flex-shrink:0">✓</div>
+            <span style="color:var(--slate);font-size:12px">Minimum CGPA of 3.50 or equivalent</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:22px;height:22px;border-radius:50%;background:rgba(52,211,153,0.15);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--emerald);flex-shrink:0">✓</div>
+            <span style="color:var(--slate);font-size:12px">Household income below RM 4,000/month</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:22px;height:22px;border-radius:50%;background:rgba(52,211,153,0.15);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--emerald);flex-shrink:0">✓</div>
+            <span style="color:var(--slate);font-size:12px">Enrolled in approved degree program</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:22px;height:22px;border-radius:50%;background:rgba(251,113,133,0.1);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--rose);flex-shrink:0">✗</div>
+            <span style="color:var(--muted);font-size:12px">Not holding any other scholarship</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Required Docs -->
+      <div style="padding:14px 16px 0">
+        <div style="font-family:var(--font-display);font-size:16px;color:#fff;margin-bottom:8px">Required Documents</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="card" style="padding:12px"><div style="font-size:22px;margin-bottom:6px">🪪</div><div style="color:#fff;font-size:12px;font-weight:700">IC / Passport</div><div style="color:var(--muted);font-size:10px">PDF or JPG, max 2MB</div></div>
+          <div class="card" style="padding:12px"><div style="font-size:22px;margin-bottom:6px">📋</div><div style="color:#fff;font-size:12px;font-weight:700">Transcript</div><div style="color:var(--muted);font-size:10px">Official university copy</div></div>
+          <div class="card" style="padding:12px"><div style="font-size:22px;margin-bottom:6px">💼</div><div style="color:#fff;font-size:12px;font-weight:700">Income Proof</div><div style="color:var(--muted);font-size:10px">Pay slip / EPF</div></div>
+          <div class="card" style="padding:12px"><div style="font-size:22px;margin-bottom:6px">✍️</div><div style="color:#fff;font-size:12px;font-weight:700">Personal Essay</div><div style="color:var(--muted);font-size:10px">500 words max</div></div>
+        </div>
+      </div>
+
+      <div style="padding:16px 16px 0">
+        <button class="btn btn-primary" onclick="showScreen('apply')">APPLY NOW →</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       SCREEN 6 · APPLICATION SUBMISSION
+  ════════════════════════════════ -->
+  <div class="screen" id="screen-apply">
+    <div class="header" style="padding-top:52px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <button onclick="showScreen('schol-detail')" style="background:var(--ink3);border:none;width:36px;height:36px;border-radius:50%;color:var(--slate);font-size:14px;cursor:pointer;flex-shrink:0;border:1px solid var(--border)">←</button>
+        <div>
+          <div class="header-sub">National Merit Scholarship</div>
+          <div class="header-title" id="apply-step-title">Submit Application</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-content">
+      <!-- Step Progress Bar -->
+      <div style="padding:16px 16px 0" id="apply-progress-bar">
+        <div style="display:flex;align-items:center;margin-bottom:8px">
+          <div id="step-dot-1" style="width:28px;height:28px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--ink);flex-shrink:0;transition:all 0.3s">1</div>
+          <div id="step-line-1" style="flex:1;height:2px;background:var(--teal);transition:all 0.3s"></div>
+          <div id="step-dot-2" style="width:28px;height:28px;border-radius:50%;background:var(--ink3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);flex-shrink:0;transition:all 0.3s">2</div>
+          <div id="step-line-2" style="flex:1;height:2px;background:var(--border);transition:all 0.3s"></div>
+          <div id="step-dot-3" style="width:28px;height:28px;border-radius:50%;background:var(--ink3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);flex-shrink:0;transition:all 0.3s">3</div>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span id="step-lbl-1" style="color:var(--teal);font-size:9px;font-weight:700">Details</span>
+          <span id="step-lbl-2" style="color:var(--muted);font-size:9px;font-weight:700;margin-left:-8px">Eligibility</span>
+          <span id="step-lbl-3" style="color:var(--muted);font-size:9px;font-weight:700">Documents</span>
+        </div>
+      </div>
+
+      <!-- ── STEP 1: Personal Details ── -->
+      <div id="apply-step-1" style="padding:14px 16px 0">
+        <div style="font-family:var(--font-display);font-size:16px;color:#fff;margin-bottom:14px">Step 1: Personal Details</div>
+        <div class="input-group">
+          <label class="input-label">Full Name (as per IC)</label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input id="ap-name" class="input-field" type="text" value="Ahmad Raheel bin Abdullah">
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">IC Number</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🪪</span>
+            <input id="ap-ic" class="input-field" type="text" placeholder="990101-14-1234">
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Phone Number</label>
+          <div class="input-wrapper">
+            <span class="input-icon">📱</span>
+            <input id="ap-phone" class="input-field" type="text" placeholder="011-2345 6789">
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">University / Institution</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🏫</span>
+            <input id="ap-uni" class="input-field" type="text" value="Universiti Malaya (UM)">
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Programme / Course</label>
+          <div class="input-wrapper">
+            <span class="input-icon">📚</span>
+            <input id="ap-course" class="input-field" type="text" placeholder="e.g. Bachelor of Computer Science">
+          </div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:6px" onclick="applyGoStep(2)">NEXT: Eligibility Check →</button>
+        <div style="height:16px"></div>
+      </div>
+
+      <!-- ── STEP 2: Eligibility ── -->
+      <div id="apply-step-2" style="display:none;padding:14px 16px 0">
+        <div style="font-family:var(--font-display);font-size:16px;color:#fff;margin-bottom:14px">Step 2: Eligibility Check</div>
+
+        <div class="card" style="background:rgba(52,211,153,0.08);border-color:rgba(52,211,153,0.3);padding:14px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:18px">✅</span>
+            <div style="flex:1">
+              <div style="color:var(--emerald);font-size:13px;font-weight:700">Eligibility Check Passed</div>
+              <div style="color:var(--muted);font-size:11px;margin-top:2px">Your profile meets all 4 criteria</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Eligibility checklist -->
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+          <div style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.25);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px">
+            <span style="color:var(--emerald);font-size:16px">✓</span>
+            <div style="flex:1"><div style="color:#fff;font-size:12px;font-weight:700">Malaysian Citizen</div><div style="color:var(--muted);font-size:10px">IC verification passed</div></div>
+          </div>
+          <div style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.25);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px">
+            <span style="color:var(--emerald);font-size:16px">✓</span>
+            <div style="flex:1"><div style="color:#fff;font-size:12px;font-weight:700">CGPA ≥ 3.5 Requirement</div><div style="color:var(--muted);font-size:10px">Your CGPA: 3.72 ✓</div></div>
+          </div>
+          <div style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.25);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px">
+            <span style="color:var(--emerald);font-size:16px">✓</span>
+            <div style="flex:1"><div style="color:#fff;font-size:12px;font-weight:700">Household Income ≤ RM 4,000</div><div style="color:var(--muted);font-size:10px">Your income: RM 2,800 ✓</div></div>
+          </div>
+          <div style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.25);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px">
+            <span style="color:var(--emerald);font-size:16px">✓</span>
+            <div style="flex:1"><div style="color:#fff;font-size:12px;font-weight:700">Full-time Undergraduate</div><div style="color:var(--muted);font-size:10px">Enrolled at UM ✓</div></div>
+          </div>
+        </div>
+
+        <div style="input-group;margin-bottom:16px">
+          <label class="input-label">Current CGPA</label>
+          <div class="input-wrapper">
+            <span class="input-icon">📊</span>
+            <input id="ap-cgpa" class="input-field" type="text" value="3.72">
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Monthly Household Income (RM)</label>
+          <div class="input-wrapper">
+            <span class="input-icon">💰</span>
+            <input id="ap-income" class="input-field" type="text" value="2,800">
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:6px">
+          <button class="btn btn-secondary" style="padding:12px;font-size:13px" onclick="applyGoStep(1)">← Back</button>
+          <button class="btn btn-primary" style="flex:1" onclick="applyGoStep(3)">NEXT: Upload Documents →</button>
+        </div>
+        <div style="height:16px"></div>
+      </div>
+
+      <!-- ── STEP 3: Document Upload ── -->
+      <div id="apply-step-3" style="display:none;padding:14px 16px 0">
+        <div style="font-family:var(--font-display);font-size:16px;color:#fff;margin-bottom:6px">Step 3: Upload Documents</div>
+        <div style="color:var(--muted);font-size:11px;margin-bottom:16px;line-height:1.6">Upload all required supporting documents. Files must be PDF, JPG, or PNG. Max 10MB each.</div>
+
+        <!-- Document slots -->
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px" id="doc-slots">
+
+          <!-- IC / Passport -->
+          <div class="doc-slot" id="slot-ic" onclick="triggerDocUpload('ic')" style="background:var(--ink3);border:1.5px dashed rgba(14,200,176,0.5);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s">
+            <div style="width:42px;height:42px;border-radius:12px;background:rgba(14,200,176,0.1);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🪪</div>
+            <div style="flex:1">
+              <div style="color:#fff;font-size:13px;font-weight:700">IC / Passport Copy <span style="color:var(--rose);font-size:10px">*Required</span></div>
+              <div style="color:var(--muted);font-size:11px" id="slot-ic-sub">Tap to upload · PDF, JPG, PNG</div>
+            </div>
+            <div id="slot-ic-status">
+              <span style="color:var(--teal);font-size:11px;font-weight:700;border:1px solid rgba(14,200,176,0.4);padding:4px 10px;border-radius:20px">Upload</span>
+            </div>
+            <input id="input-ic" type="file" style="display:none" accept=".pdf,.jpg,.jpeg,.png" onchange="handleDocUpload(this,'ic','IC / Passport')">
+          </div>
+
+          <!-- Official Transcript - pre-uploaded -->
+          <div id="slot-transcript" style="background:rgba(52,211,153,0.06);border:1.5px solid rgba(52,211,153,0.4);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px">
+            <div style="width:42px;height:42px;border-radius:12px;background:rgba(52,211,153,0.12);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📋</div>
+            <div style="flex:1">
+              <div style="color:#fff;font-size:13px;font-weight:700">Official Transcript <span style="color:var(--rose);font-size:10px">*Required</span></div>
+              <div style="color:var(--emerald);font-size:11px">✓ transcript_um_2026.pdf · 1.2 MB</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <span class="badge badge-green">Done</span>
+              <span onclick="removeDoc('transcript')" style="color:var(--muted);font-size:16px;cursor:pointer;padding:2px 6px;border-radius:6px;hover:background:rgba(255,255,255,0.1)">✕</span>
+            </div>
+          </div>
+
+          <!-- Income Proof -->
+          <div class="doc-slot" id="slot-income" onclick="triggerDocUpload('income')" style="background:var(--ink3);border:1.5px dashed rgba(148,163,184,0.3);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s">
+            <div style="width:42px;height:42px;border-radius:12px;background:rgba(245,166,35,0.1);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">💼</div>
+            <div style="flex:1">
+              <div style="color:#fff;font-size:13px;font-weight:700">Income Proof / Payslip <span style="color:var(--rose);font-size:10px">*Required</span></div>
+              <div style="color:var(--muted);font-size:11px" id="slot-income-sub">Tap to upload · PDF, JPG, PNG</div>
+            </div>
+            <div id="slot-income-status">
+              <span style="color:var(--muted);font-size:11px;font-weight:700;border:1px solid var(--border);padding:4px 10px;border-radius:20px">Upload</span>
+            </div>
+            <input id="input-income" type="file" style="display:none" accept=".pdf,.jpg,.jpeg,.png" onchange="handleDocUpload(this,'income','Income Proof')">
+          </div>
+
+          <!-- Personal Statement -->
+          <div class="doc-slot" id="slot-essay" onclick="triggerDocUpload('essay')" style="background:var(--ink3);border:1.5px dashed rgba(148,163,184,0.3);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s">
+            <div style="width:42px;height:42px;border-radius:12px;background:rgba(167,139,250,0.1);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">✍️</div>
+            <div style="flex:1">
+              <div style="color:#fff;font-size:13px;font-weight:700">Personal Statement <span style="color:var(--slate);font-size:10px">Optional</span></div>
+              <div style="color:var(--muted);font-size:11px" id="slot-essay-sub">Tap to upload · PDF or DOCX</div>
+            </div>
+            <div id="slot-essay-status">
+              <span style="color:var(--muted);font-size:11px;font-weight:700;border:1px solid var(--border);padding:4px 10px;border-radius:20px">Upload</span>
+            </div>
+            <input id="input-essay" type="file" style="display:none" accept=".pdf,.docx,.doc" onchange="handleDocUpload(this,'essay','Personal Statement')">
+          </div>
+
+          <!-- Recommendation Letter -->
+          <div class="doc-slot" id="slot-rec" onclick="triggerDocUpload('rec')" style="background:var(--ink3);border:1.5px dashed rgba(148,163,184,0.3);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s">
+            <div style="width:42px;height:42px;border-radius:12px;background:rgba(56,189,248,0.1);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📝</div>
+            <div style="flex:1">
+              <div style="color:#fff;font-size:13px;font-weight:700">Recommendation Letter <span style="color:var(--slate);font-size:10px">Optional</span></div>
+              <div style="color:var(--muted);font-size:11px" id="slot-rec-sub">Tap to upload · PDF</div>
+            </div>
+            <div id="slot-rec-status">
+              <span style="color:var(--muted);font-size:11px;font-weight:700;border:1px solid var(--border);padding:4px 10px;border-radius:20px">Upload</span>
+            </div>
+            <input id="input-rec" type="file" style="display:none" accept=".pdf" onchange="handleDocUpload(this,'rec','Recommendation Letter')">
+          </div>
+        </div>
+
+        <!-- Upload summary counter -->
+        <div id="doc-summary" style="background:var(--ink3);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
+          <span style="font-size:18px">📁</span>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:12px;font-weight:700">Documents uploaded: <span id="doc-count" style="color:var(--teal)">1 / 3 required</span></div>
+            <div style="color:var(--muted);font-size:10px" id="doc-summary-sub">Upload IC and Income Proof to proceed</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:6px">
+          <button class="btn btn-secondary" style="padding:12px;font-size:13px" onclick="applyGoStep(2)">← Back</button>
+          <button class="btn btn-primary" style="flex:1" id="submit-app-btn" onclick="handleSubmitApplication()">SUBMIT APPLICATION →</button>
+        </div>
+        <div style="height:16px"></div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       SCREEN 7 · APPLICATION TRACKER
+  ════════════════════════════════ -->
+  <div class="screen" id="screen-tracker">
+    <div class="header" style="padding-top:52px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <button onclick="showScreen('dashboard')" style="background:var(--ink3);border:none;width:36px;height:36px;border-radius:50%;color:var(--slate);font-size:14px;cursor:pointer;flex-shrink:0;border:1px solid var(--border)">←</button>
+        <div>
+          <div class="header-sub">Track Your Progress</div>
+          <div class="header-title">My Applications</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-content">
+      <div class="stat-grid" style="padding-top:14px">
+        <div class="stat-box"><style>.stat-box:nth-child(1)::before{background:var(--muted)}.stat-box:nth-child(2)::before{background:var(--amber)}.stat-box:nth-child(3)::before{background:var(--emerald)}.stat-box:nth-child(4)::before{background:var(--rose)}</style>
+          <div class="stat-label">Total</div><div class="stat-value">4</div>
+        </div>
+        <div class="stat-box"><div class="stat-label">Pending</div><div class="stat-value" style="color:var(--amber)">2</div></div>
+        <div class="stat-box"><div class="stat-label">Approved</div><div class="stat-value" style="color:var(--emerald)">1</div></div>
+        <div class="stat-box"><div class="stat-label">Rejected</div><div class="stat-value" style="color:var(--rose)">1</div></div>
+      </div>
+
+      <div style="padding:0 16px 12px">
+        <div style="display:flex;background:var(--ink3);border-radius:12px;padding:4px;border:1px solid var(--border)">
+          <div style="flex:1;padding:8px;border-radius:8px;text-align:center;background:linear-gradient(90deg,var(--teal),var(--sky));color:var(--ink);font-size:11px;font-weight:800;cursor:pointer">All (4)</div>
+          <div style="flex:1;padding:8px;text-align:center;color:var(--muted);font-size:11px;cursor:pointer;font-weight:600">Pending</div>
+          <div style="flex:1;padding:8px;text-align:center;color:var(--muted);font-size:11px;cursor:pointer;font-weight:600">Approved</div>
+          <div style="flex:1;padding:8px;text-align:center;color:var(--muted);font-size:11px;cursor:pointer;font-weight:600">Rejected</div>
+        </div>
+      </div>
+
+      <!-- Approved -->
+      <div class="tracker-card" style="border:1.5px solid rgba(52,211,153,0.35)">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--emerald);border-radius:18px 0 0 18px"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div style="color:#fff;font-size:13px;font-weight:800">Khazanah Global Scholars</div>
+          <span class="badge badge-green">✓ Approved</span>
+        </div>
+        <div style="color:var(--muted);font-size:10px;margin-bottom:10px">Submitted: Jan 15, 2026</div>
+        <div class="progress-track"><div class="progress-fill" style="width:100%;background:linear-gradient(90deg,var(--emerald),var(--teal))"></div></div>
+        <div class="step-row">
+          <div class="step-dot" style="background:var(--emerald);color:var(--ink)">✓</div>
+          <div class="step-line" style="background:var(--emerald)"></div>
+          <div class="step-dot" style="background:var(--emerald);color:var(--ink)">✓</div>
+          <div class="step-line" style="background:var(--emerald)"></div>
+          <div class="step-dot" style="background:var(--emerald);color:var(--ink)">✓</div>
+          <div class="step-line" style="background:var(--emerald)"></div>
+          <div class="step-dot" style="background:var(--emerald);color:var(--ink)">✓</div>
+        </div>
+        <div class="step-labels">
+          <div class="step-label">Submit</div><div class="step-label">Review</div><div class="step-label">Interview</div><div class="step-label">Approved</div>
+        </div>
+      </div>
+
+      <!-- Pending 1 -->
+      <div class="tracker-card" style="border:1px solid var(--border)">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--amber);border-radius:18px 0 0 18px"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div style="color:#fff;font-size:13px;font-weight:800">National Merit Scholarship</div>
+          <span class="badge badge-amber">⏳ Pending</span>
+        </div>
+        <div style="color:var(--muted);font-size:10px;margin-bottom:10px">Submitted: Feb 28, 2026</div>
+        <div class="progress-track"><div class="progress-fill" style="width:50%;background:var(--amber)"></div></div>
+        <div class="step-row">
+          <div class="step-dot" style="background:var(--amber);color:var(--ink)">✓</div>
+          <div class="step-line" style="background:var(--amber)"></div>
+          <div class="step-dot" style="background:var(--amber);color:var(--ink)">✓</div>
+          <div class="step-line" style="background:var(--border)"></div>
+          <div class="step-dot" style="background:var(--ink3);border:2px solid var(--border);color:var(--muted)">3</div>
+          <div class="step-line" style="background:var(--border)"></div>
+          <div class="step-dot" style="background:var(--ink3);border:2px solid var(--border);color:var(--muted)">4</div>
+        </div>
+        <div style="color:var(--muted);font-size:11px;margin-top:10px;font-style:italic">Under review by committee…</div>
+      </div>
+
+      <!-- Pending 2 -->
+      <div class="tracker-card" style="border:1px solid var(--border)">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--sky);border-radius:18px 0 0 18px"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div style="color:#fff;font-size:13px;font-weight:800">Yayasan Telekom Scholarship</div>
+          <span class="badge badge-amber">⏳ Pending</span>
+        </div>
+        <div style="color:var(--muted);font-size:10px;margin-bottom:10px">Submitted: Mar 01, 2026</div>
+        <div class="progress-track"><div class="progress-fill" style="width:25%;background:var(--sky)"></div></div>
+        <div style="color:var(--muted);font-size:11px;margin-top:10px;font-style:italic">📄 Documents pending verification</div>
+      </div>
+
+      <!-- Rejected -->
+      <div class="tracker-card" style="border:1px dashed rgba(251,113,133,0.4);opacity:0.75">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--rose);border-radius:18px 0 0 18px"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div style="color:var(--slate);font-size:13px;font-weight:800">Bank Negara Scholarship</div>
+          <span class="badge badge-rose">✗ Rejected</span>
+        </div>
+        <div style="color:var(--rose);font-size:11px;margin-bottom:10px">Did not meet income criteria</div>
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn btn-outline" style="border-color:var(--rose);color:var(--rose)">Re-apply</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="showScreen('dashboard')"><span>🏠</span><span>Home</span></div>
+      <div class="nav-item" onclick="showScreen('scholarships')"><span>🎓</span><span>Scholarships</span></div>
+      <div class="nav-item active"><span>📋</span><span>Track</span></div>
+      <div class="nav-item" onclick="showScreen('resources')"><span>📚</span><span>Resources</span></div>
+      <div class="nav-item" onclick="showScreen('mentor')"><span>🤝</span><span>Mentors</span></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       SCREEN 8 · RESOURCE SHARING
+  ════════════════════════════════ -->
+  <div class="screen" id="screen-resources">
+    <div class="header" style="padding-top:52px;border-bottom:1px solid rgba(167,139,250,0.2)">
+      <div class="header-row">
+        <div>
+          <div class="header-sub">Knowledge Hub</div>
+          <div class="header-title">Free Resources</div>
+        </div>
+        <div style="width:40px;height:40px;border-radius:50%;background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;color:var(--violet);font-weight:700">+</div>
+      </div>
+    </div>
+
+    <div class="scroll-content">
+      <div style="padding:14px 16px 0">
+        <div style="background:linear-gradient(135deg,rgba(167,139,250,0.12),rgba(56,189,248,0.06));border:1px solid rgba(167,139,250,0.3);border-radius:20px;padding:16px;display:flex;align-items:center;gap:14px">
+          <div style="width:48px;height:48px;border-radius:14px;background:rgba(167,139,250,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📤</div>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:13px;font-weight:800;margin-bottom:2px">Share Your Knowledge!</div>
+            <div style="color:var(--muted);font-size:11px">Help others by uploading notes &amp; guides</div>
+          </div>
+          <button class="btn btn-sm" style="background:linear-gradient(135deg,var(--violet),#818CF8);color:white;flex-shrink:0">Upload</button>
+        </div>
+      </div>
+
+      <div class="search-bar">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" type="text" placeholder="Search resources, subjects...">
+        </div>
+      </div>
+
+      <div style="padding:0 16px 10px">
+        <div class="chip-row">
+          <div class="chip" style="background:var(--violet);color:white">All</div>
+          <div class="chip chip-inactive">Notes</div>
+          <div class="chip chip-inactive">Books</div>
+          <div class="chip chip-inactive">Guides</div>
+          <div class="chip chip-inactive">Videos</div>
+        </div>
+      </div>
+
+      <div style="padding:0 16px 8px;display:flex;justify-content:space-between">
+        <span style="color:var(--muted);font-size:12px"><b style="color:var(--violet)">240</b> resources available</span>
+        <span style="color:var(--slate);font-size:11px">Most downloaded ▼</span>
+      </div>
+
+      <div class="resource-card">
+        <div class="file-icon" style="background:rgba(251,113,133,0.12)"><span>📄</span><span class="file-type-label" style="color:var(--rose)">PDF</span></div>
+        <div style="flex:1;min-width:0">
+          <div style="color:#fff;font-size:13px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Advanced Calculus Notes</div>
+          <div style="color:var(--muted);font-size:11px;margin-bottom:4px">By Ahmad Raheel · Mathematics</div>
+          <div style="display:flex;gap:6px">
+            <span class="badge badge-rose" style="font-size:9px">Calculus</span>
+            <span class="badge badge-sky" style="font-size:9px">2.4MB</span>
+            <span style="color:var(--muted);font-size:10px">📥 128</span>
+          </div>
+        </div>
+        <button class="btn btn-outline" style="border-color:var(--violet);color:var(--violet);align-self:flex-start;flex-shrink:0;font-size:14px;padding:8px 12px" onclick="showToast('📥 Download started — Advanced Calculus Notes.pdf','success')">↓</button>
+      </div>
+
+      <div class="resource-card">
+        <div class="file-icon" style="background:rgba(56,189,248,0.12)"><span>📊</span><span class="file-type-label" style="color:var(--sky)">PPT</span></div>
+        <div style="flex:1;min-width:0">
+          <div style="color:#fff;font-size:13px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Data Structures &amp; Algorithms</div>
+          <div style="color:var(--muted);font-size:11px;margin-bottom:4px">By Zuhair Abid · CS</div>
+          <div style="display:flex;gap:6px">
+            <span class="badge badge-sky" style="font-size:9px">CS</span>
+            <span class="badge badge-violet" style="font-size:9px">8.1MB</span>
+            <span style="color:var(--muted);font-size:10px">📥 204</span>
+          </div>
+        </div>
+        <button class="btn btn-outline" style="border-color:var(--violet);color:var(--violet);align-self:flex-start;flex-shrink:0;font-size:14px;padding:8px 12px" onclick="showToast('📥 Download started — DSA_Slides.pptx','success')">↓</button>
+      </div>
+
+      <div class="resource-card">
+        <div class="file-icon" style="background:rgba(52,211,153,0.12)"><span>📝</span><span class="file-type-label" style="color:var(--emerald)">DOC</span></div>
+        <div style="flex:1;min-width:0">
+          <div style="color:#fff;font-size:13px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Scholarship Application Guide</div>
+          <div style="color:var(--muted);font-size:11px;margin-bottom:4px">By EduBridge Team · Career</div>
+          <div style="display:flex;gap:6px">
+            <span class="badge badge-green" style="font-size:9px">Guide</span>
+            <span style="color:var(--muted);font-size:10px">📥 512</span>
+          </div>
+        </div>
+        <button class="btn btn-outline" style="border-color:var(--violet);color:var(--violet);align-self:flex-start;flex-shrink:0;font-size:14px;padding:8px 12px" onclick="showToast('📥 Download started — Scholarship_Guide.docx','success')">↓</button>
+      </div>
+
+      <!-- Upload Zone -->
+      <div class="section-title">Upload a Resource</div>
+      <div style="padding:0 16px 16px">
+        <!-- Info banner about approval process -->
+        <div style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.25);border-radius:14px;padding:12px 14px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start">
+          <span style="font-size:16px;flex-shrink:0">ℹ️</span>
+          <div>
+            <div style="color:var(--amber);font-size:12px;font-weight:700;margin-bottom:2px">Admin Approval Required</div>
+            <div style="color:var(--muted);font-size:11px;line-height:1.5">Your upload will be reviewed by an admin before it becomes visible to other students. Only PDF, DOCX, and PPT files are accepted.</div>
+          </div>
+        </div>
+
+        <div id="upload-zone-box" class="upload-zone" onclick="document.getElementById('file-upload-input').click()">
+          <div style="font-size:40px;margin-bottom:10px">☁️</div>
+          <div style="color:var(--violet);font-size:13px;font-weight:700;margin-bottom:4px">Tap to select a file</div>
+          <div style="color:var(--muted);font-size:11px;margin-bottom:4px">PDF, DOCX, PPT · Max 20MB</div>
+          <div style="color:rgba(251,113,133,0.7);font-size:10px;margin-bottom:12px">⚠ File type not validated — any format accepted (known issue)</div>
+          <button class="btn btn-sm" style="background:rgba(167,139,250,0.15);color:var(--violet);border:1px solid rgba(167,139,250,0.4)" onclick="event.stopPropagation();document.getElementById('file-upload-input').click()">Browse Files</button>
+          <input id="file-upload-input" type="file" style="display:none" onchange="handleFileUpload(this)">
+        </div>
+        <div id="upload-feedback" style="display:none;margin-top:10px;padding:12px 14px;border-radius:12px;font-size:12px;font-weight:600"></div>
+
+        <!-- Pending approval notice (shown after upload) -->
+        <div id="upload-pending-notice" style="display:none;margin-top:10px;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.3);border-radius:12px;padding:12px 14px">
+          <div style="color:var(--amber);font-size:12px;font-weight:700;margin-bottom:4px">⏳ Awaiting Admin Approval</div>
+          <div style="color:var(--muted);font-size:11px;line-height:1.5">Your file has been submitted and is pending review. It will appear in the resources list once an admin approves it.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="showScreen('dashboard')"><span>🏠</span><span>Home</span></div>
+      <div class="nav-item" onclick="showScreen('scholarships')"><span>🎓</span><span>Scholarships</span></div>
+      <div class="nav-item" onclick="showScreen('tracker')"><span>📋</span><span>Track</span></div>
+      <div class="nav-item active"><span>📚</span><span>Resources</span></div>
+      <div class="nav-item" onclick="showScreen('mentor')"><span>🤝</span><span>Mentors</span></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       SCREEN 9 · MENTOR REQUEST
+  ════════════════════════════════ -->
+  <div class="screen" id="screen-mentor">
+    <div class="header" style="padding-top:52px;border-bottom:1px solid rgba(52,211,153,0.2)">
+      <div class="header-row">
+        <div>
+          <div class="header-sub">Connect &amp; Grow</div>
+          <div class="header-title">Find a Mentor</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <div class="online-dot"></div>
+          <span style="color:var(--emerald);font-size:11px;font-weight:700">8 online</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-content">
+      <div class="search-bar">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" type="text" placeholder="Search mentor name or expertise...">
+        </div>
+        <button style="background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);border-radius:14px;width:48px;cursor:pointer;font-size:16px;color:var(--emerald)">⚙</button>
+      </div>
+
+      <div style="padding:0 16px 10px">
+        <div class="chip-row">
+          <div class="chip" style="background:var(--emerald);color:var(--ink)">All</div>
+          <div class="chip chip-inactive">Tech</div>
+          <div class="chip chip-inactive">Finance</div>
+          <div class="chip chip-inactive">Medicine</div>
+          <div class="chip chip-inactive">Law</div>
+          <div class="chip chip-inactive">Science</div>
+        </div>
+      </div>
+
+      <!-- Mentor 1 -->
+      <div class="mentor-card" style="cursor:pointer" onclick="openMentorProfile('Dr. Sarah Ahmed','Software Engineer · Google Malaysia',['Tech','Scholarships','Career'],'4.9')">
+        <div style="position:relative;flex-shrink:0">
+          <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,rgba(14,200,176,0.25),rgba(56,189,248,0.1));display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid rgba(14,200,176,0.3)">👩‍💻</div>
+          <div class="online-dot" style="position:absolute;bottom:0;right:0;border:2px solid var(--ink3)"></div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <span style="color:#fff;font-size:14px;font-weight:800">Dr. Sarah Ahmed</span>
+            <span class="badge badge-teal" style="font-size:9px">⭐ 4.9</span>
+          </div>
+          <div style="color:var(--muted);font-size:11px;margin-bottom:6px">Software Engineer · Google Malaysia</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            <span class="badge badge-sky" style="font-size:9px">Tech</span>
+            <span class="badge badge-teal" style="font-size:9px">Scholarships</span>
+          </div>
+        </div>
+        <span style="color:var(--muted);font-size:18px;flex-shrink:0">›</span>
+      </div>
+
+      <!-- Mentor 2 -->
+      <div class="mentor-card" style="cursor:pointer" onclick="openMentorProfile('Prof. Zainal Hassan','Finance Professor · UTM',['Finance','Business','Investment'],'4.7')">
+        <div style="position:relative;flex-shrink:0">
+          <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,rgba(167,139,250,0.2),rgba(56,189,248,0.1));display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid rgba(167,139,250,0.3)">👨‍🏫</div>
+          <div class="online-dot" style="position:absolute;bottom:0;right:0;border:2px solid var(--ink3)"></div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <span style="color:#fff;font-size:14px;font-weight:800">Prof. Zainal Hassan</span>
+            <span class="badge badge-violet" style="font-size:9px">⭐ 4.7</span>
+          </div>
+          <div style="color:var(--muted);font-size:11px;margin-bottom:6px">Finance Professor · UTM</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            <span class="badge badge-violet" style="font-size:9px">Finance</span>
+            <span class="badge badge-amber" style="font-size:9px">Business</span>
+          </div>
+        </div>
+        <span style="color:var(--muted);font-size:18px;flex-shrink:0">›</span>
+      </div>
+
+      <!-- Mentor 3 - offline -->
+      <div class="mentor-card" style="opacity:0.6">
+        <div style="position:relative;flex-shrink:0">
+          <div style="width:50px;height:50px;border-radius:50%;background:rgba(148,163,184,0.1);display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid var(--border)">👩‍⚕️</div>
+          <div class="offline-dot" style="position:absolute;bottom:0;right:0;border:2px solid var(--ink3)"></div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <span style="color:var(--slate);font-size:14px;font-weight:800">Dr. Nisha Patel</span>
+            <span class="badge badge-gray" style="font-size:9px">⭐ 4.8</span>
+          </div>
+          <div style="color:var(--muted);font-size:11px;margin-bottom:6px">Medical Doctor · UMMC</div>
+          <div style="display:flex;gap:5px">
+            <span class="badge badge-gray" style="font-size:9px">Medicine</span>
+          </div>
+        </div>
+        <button class="btn btn-sm" style="background:var(--ink3);color:var(--muted);border:1px solid var(--border);align-self:flex-start;flex-shrink:0;cursor:not-allowed">Offline</button>
+      </div>
+
+      <!-- Current mentorship -->
+      <div class="section-title">My Active Mentorship</div>
+      <div style="padding:0 16px 16px">
+        <div class="card" style="border-color:rgba(52,211,153,0.35);display:flex;align-items:center;gap:12px;padding:14px">
+          <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,rgba(14,200,176,0.2),rgba(52,211,153,0.1));display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid rgba(52,211,153,0.3)">👩‍💼</div>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:14px;font-weight:800">Dr. Sarah Ahmed</div>
+            <div style="color:var(--muted);font-size:11px">Active since Jan 2026</div>
+            <div style="color:var(--emerald);font-size:11px;margin-top:4px;font-weight:600">✓ Next session: Mar 15</div>
+          </div>
+          <button class="btn btn-outline" style="border-color:var(--emerald);color:var(--emerald);font-size:16px;padding:8px 12px">💬</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="showScreen('dashboard')"><span>🏠</span><span>Home</span></div>
+      <div class="nav-item" onclick="showScreen('scholarships')"><span>🎓</span><span>Scholarships</span></div>
+      <div class="nav-item" onclick="showScreen('tracker')"><span>📋</span><span>Track</span></div>
+      <div class="nav-item" onclick="showScreen('resources')"><span>📚</span><span>Resources</span></div>
+      <div class="nav-item active"><span>🤝</span><span>Mentors</span></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       SCREEN 9b · MENTOR PROFILE
+  ════════════════════════════════ -->
+  <div class="screen" id="screen-mentor-profile">
+    <div class="status-bar"><span>9:41</span><span>●●●●</span></div>
+
+    <div class="scroll-content" style="padding-bottom:100px">
+      <!-- Back button -->
+      <div style="padding:12px 16px 0">
+        <button onclick="showScreen('mentor')" style="background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:8px 14px;color:var(--slate);font-family:var(--font-body);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">← Back to Mentors</button>
+      </div>
+
+      <!-- Profile hero -->
+      <div style="padding:20px 16px 0;text-align:center">
+        <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(14,200,176,0.25),rgba(56,189,248,0.1));border:3px solid rgba(14,200,176,0.4);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 12px">👩‍💻</div>
+        <div style="font-family:var(--font-display);font-size:22px;color:#fff;margin-bottom:4px" id="mp-name">Dr. Sarah Ahmed</div>
+        <div style="color:var(--muted);font-size:13px;margin-bottom:8px" id="mp-role">Software Engineer · Google Malaysia</div>
+        <div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:12px">
+          <span id="mp-rating" class="badge badge-teal">⭐ 4.9</span>
+          <span class="badge badge-green">✓ Available</span>
+        </div>
+        <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap" id="mp-tags"></div>
+      </div>
+
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:18px 16px 0">
+        <div class="card" style="padding:12px;text-align:center">
+          <div style="color:var(--muted);font-size:9px;font-weight:700;letter-spacing:0.5px;margin-bottom:4px">MENTEES</div>
+          <div style="font-size:22px;font-weight:800;color:var(--emerald)">12</div>
+          <span style="color:var(--muted);font-size:9px">Total</span>
+        </div>
+        <div class="card" style="padding:12px;text-align:center">
+          <div style="color:var(--muted);font-size:9px;font-weight:700;letter-spacing:0.5px;margin-bottom:4px">SESSIONS</div>
+          <div style="font-size:22px;font-weight:800;color:var(--sky)">48</div>
+          <span style="color:var(--muted);font-size:9px">Completed</span>
+        </div>
+        <div class="card" style="padding:12px;text-align:center">
+          <div style="color:var(--muted);font-size:9px;font-weight:700;letter-spacing:0.5px;margin-bottom:4px">RESPONSE</div>
+          <div style="font-size:22px;font-weight:800;color:var(--amber)">~2h</div>
+          <span style="color:var(--muted);font-size:9px">Avg. reply</span>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div class="section-title">About</div>
+      <div style="padding:0 16px">
+        <div class="card" style="padding:14px">
+          <div style="color:var(--slate);font-size:12px;line-height:1.7">Experienced software engineer with 8+ years at Google Malaysia. Passionate about guiding students through scholarship applications, tech internships, and career planning. Previously mentored 12 students who successfully secured placements at top companies.</div>
+        </div>
+      </div>
+
+      <!-- Availability -->
+      <div class="section-title">Available Days</div>
+      <div style="padding:0 16px">
+        <div class="card" style="padding:14px;display:flex;gap:8px;flex-wrap:wrap">
+          <div style="background:rgba(14,200,176,0.12);border:1px solid rgba(14,200,176,0.4);border-radius:10px;padding:6px 12px;color:var(--teal);font-size:11px;font-weight:700">Mon</div>
+          <div style="background:rgba(14,200,176,0.12);border:1px solid rgba(14,200,176,0.4);border-radius:10px;padding:6px 12px;color:var(--teal);font-size:11px;font-weight:700">Wed</div>
+          <div style="background:rgba(14,200,176,0.12);border:1px solid rgba(14,200,176,0.4);border-radius:10px;padding:6px 12px;color:var(--teal);font-size:11px;font-weight:700">Fri</div>
+          <div style="background:var(--ink4);border:1px solid var(--border);border-radius:10px;padding:6px 12px;color:var(--muted);font-size:11px;font-weight:700">Tue</div>
+          <div style="background:var(--ink4);border:1px solid var(--border);border-radius:10px;padding:6px 12px;color:var(--muted);font-size:11px;font-weight:700">Thu</div>
+          <div style="background:var(--ink4);border:1px solid var(--border);border-radius:10px;padding:6px 12px;color:var(--muted);font-size:11px;font-weight:700">Sat</div>
+        </div>
+      </div>
+
+      <!-- How mentorship works -->
+      <div class="section-title">How It Works</div>
+      <div style="padding:0 16px;display:flex;flex-direction:column;gap:10px">
+        <div class="card" style="display:flex;align-items:center;gap:12px;padding:12px 14px">
+          <div style="width:32px;height:32px;border-radius:50%;background:rgba(14,200,176,0.12);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--teal);flex-shrink:0">1</div>
+          <div style="color:var(--slate);font-size:12px;line-height:1.5">Send a request — the mentor will review your profile and topic</div>
+        </div>
+        <div class="card" style="display:flex;align-items:center;gap:12px;padding:12px 14px">
+          <div style="width:32px;height:32px;border-radius:50%;background:rgba(56,189,248,0.12);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--sky);flex-shrink:0">2</div>
+          <div style="color:var(--slate);font-size:12px;line-height:1.5">Mentor accepts and your mentorship dashboard activates</div>
+        </div>
+        <div class="card" style="display:flex;align-items:center;gap:12px;padding:12px 14px">
+          <div style="width:32px;height:32px;border-radius:50%;background:rgba(52,211,153,0.12);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--emerald);flex-shrink:0">3</div>
+          <div style="color:var(--slate);font-size:12px;line-height:1.5">Schedule sessions and track your progress together</div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div style="padding:20px 16px 16px">
+        <button id="mp-request-btn" class="btn btn-primary" onclick="handleMentorRequest('Dr. Sarah Ahmed', this)">SEND MENTORSHIP REQUEST →</button>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="showScreen('dashboard')"><span>🏠</span><span>Home</span></div>
+      <div class="nav-item" onclick="showScreen('scholarships')"><span>🎓</span><span>Scholarships</span></div>
+      <div class="nav-item" onclick="showScreen('tracker')"><span>📋</span><span>Track</span></div>
+      <div class="nav-item" onclick="showScreen('resources')"><span>📚</span><span>Resources</span></div>
+      <div class="nav-item active" onclick="showScreen('mentor')"><span>🤝</span><span>Mentors</span></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       SCREEN 10 · MENTOR DASHBOARD
+  ════════════════════════════════ -->
+  <div class="screen" id="screen-mentor-dash">
+    <div class="header" style="padding-top:52px">
+      <div class="header-row">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--emerald),var(--teal));display:flex;align-items:center;justify-content:center;font-size:20px">👩‍💻</div>
+          <div>
+            <div style="color:var(--muted);font-size:11px;font-weight:600">Mentor Portal</div>
+            <div style="color:#fff;font-family:var(--font-display);font-size:18px">Dr. Sarah Ahmed</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;align-items:center;gap:5px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);padding:5px 10px;border-radius:20px;cursor:pointer">
+            <div class="online-dot" style="width:7px;height:7px"></div>
+            <span style="color:var(--emerald);font-size:10px;font-weight:700">Available</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-content">
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:14px 16px 0">
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="color:var(--muted);font-size:9px;font-weight:700;letter-spacing:0.8px;margin-bottom:4px">STUDENTS</div>
+          <div style="font-size:24px;font-weight:800;color:var(--emerald)">6</div>
+          <span style="color:var(--muted);font-size:9px">Active</span>
+        </div>
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="color:var(--muted);font-size:9px;font-weight:700;letter-spacing:0.8px;margin-bottom:4px">REQUESTS</div>
+          <div style="font-size:24px;font-weight:800;color:var(--amber)">3</div>
+          <span style="color:var(--amber);font-size:9px">Pending</span>
+        </div>
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="color:var(--muted);font-size:9px;font-weight:700;letter-spacing:0.8px;margin-bottom:4px">RATING</div>
+          <div style="font-size:24px;font-weight:800;color:var(--teal)">4.9</div>
+          <span style="color:var(--teal);font-size:9px">⭐ Excellent</span>
+        </div>
+      </div>
+
+      <div class="section-title">Incoming Requests</div>
+
+      <!-- Request 1 - Pending -->
+      <div class="request-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(14,200,176,0.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🧑‍🎓</div>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:13px;font-weight:800">Ahmad Raheel</div>
+            <div style="color:var(--muted);font-size:11px">Topic: Scholarship Application Tips</div>
+          </div>
+          <span class="badge badge-amber">New</span>
+        </div>
+        <div style="color:var(--muted);font-size:11px;margin-bottom:10px;font-style:italic">"I'm applying for the National Merit Scholarship and need guidance on the personal essay..."</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm" style="flex:1;background:linear-gradient(90deg,var(--emerald),var(--teal));color:var(--ink)" onclick="handleMentorAccept(this,'Ahmad Raheel')">✓ Accept</button>
+          <button class="btn btn-sm" style="flex:1;background:rgba(251,113,133,0.1);color:var(--rose);border:1px solid rgba(251,113,133,0.3)" onclick="handleMentorDecline(this,'Ahmad Raheel')">✗ Decline</button>
+        </div>
+      </div>
+
+      <!-- Request 2 - Pending -->
+      <div class="request-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(167,139,250,0.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">👧</div>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:13px;font-weight:800">Siti Aminah</div>
+            <div style="color:var(--muted);font-size:11px">Topic: Career in Software Engineering</div>
+          </div>
+          <span class="badge badge-amber">New</span>
+        </div>
+        <div style="color:var(--muted);font-size:11px;margin-bottom:10px;font-style:italic">"I'm a CS sophomore and would love advice on landing internships..."</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm" style="flex:1;background:linear-gradient(90deg,var(--emerald),var(--teal));color:var(--ink)" onclick="handleMentorAccept(this,'Siti Aminah')">✓ Accept</button>
+          <button class="btn btn-sm" style="flex:1;background:rgba(251,113,133,0.1);color:var(--rose);border:1px solid rgba(251,113,133,0.3)" onclick="handleMentorDecline(this,'Siti Aminah')">✗ Decline</button>
+        </div>
+      </div>
+
+      <div class="section-title">Active Mentees</div>
+      <div style="padding:0 16px;display:flex;flex-direction:column;gap:10px">
+        <div class="card" style="display:flex;align-items:center;gap:12px;padding:12px 14px">
+          <div style="width:38px;height:38px;border-radius:50%;background:rgba(14,200,176,0.12);display:flex;align-items:center;justify-content:center;font-size:17px">🧑‍💻</div>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:13px;font-weight:700">Irfan Hakimi</div>
+            <div style="color:var(--muted);font-size:10px">Session in 2 days</div>
+          </div>
+          <button class="btn btn-sm" style="background:rgba(14,200,176,0.1);color:var(--teal);border:1px solid rgba(14,200,176,0.3)">💬 Chat</button>
+        </div>
+        <div class="card" style="display:flex;align-items:center;gap:12px;padding:12px 14px">
+          <div style="width:38px;height:38px;border-radius:50%;background:rgba(167,139,250,0.12);display:flex;align-items:center;justify-content:center;font-size:17px">👧</div>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:13px;font-weight:700">Nur Farah</div>
+            <div style="color:var(--muted);font-size:10px">Session completed last week</div>
+          </div>
+          <button class="btn btn-sm" style="background:rgba(14,200,176,0.1);color:var(--teal);border:1px solid rgba(14,200,176,0.3)">💬 Chat</button>
+        </div>
+      </div>
+
+      <!-- Availability Toggle -->
+      <div class="section-title">Availability</div>
+      <div style="padding:0 16px 16px">
+        <div class="card" style="padding:16px">
+          <div style="color:#fff;font-size:13px;font-weight:700;margin-bottom:10px">Update Your Schedule</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="background:rgba(14,200,176,0.12);border:1px solid rgba(14,200,176,0.4);border-radius:10px;padding:6px 12px;color:var(--teal);font-size:11px;font-weight:700;cursor:pointer">Mon</div>
+            <div style="background:rgba(14,200,176,0.12);border:1px solid rgba(14,200,176,0.4);border-radius:10px;padding:6px 12px;color:var(--teal);font-size:11px;font-weight:700;cursor:pointer">Wed</div>
+            <div style="background:rgba(14,200,176,0.12);border:1px solid rgba(14,200,176,0.4);border-radius:10px;padding:6px 12px;color:var(--teal);font-size:11px;font-weight:700;cursor:pointer">Fri</div>
+            <div style="background:var(--ink4);border:1px solid var(--border);border-radius:10px;padding:6px 12px;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer">Tue</div>
+            <div style="background:var(--ink4);border:1px solid var(--border);border-radius:10px;padding:6px 12px;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer">Thu</div>
+            <div style="background:var(--ink4);border:1px solid var(--border);border-radius:10px;padding:6px 12px;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer">Sat</div>
+          </div>
+          <button class="btn btn-secondary" style="margin-top:12px;padding:10px">Update Availability</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active"><span>🏠</span><span>Home</span></div>
+      <div class="nav-item"><span>📋</span><span>Requests</span></div>
+      <div class="nav-item"><span>👥</span><span>Mentees</span></div>
+      <div class="nav-item"><span>👤</span><span>Profile</span></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       SCREEN 11 · ADMIN DASHBOARD
+  ════════════════════════════════ -->
+  <div class="screen" id="screen-admin">
+    <div style="background:linear-gradient(160deg,#1A0D2E,#120920);padding:52px 20px 16px;flex-shrink:0;position:relative;overflow:hidden;border-bottom:1px solid rgba(251,113,133,0.15)">
+      <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,0.07),transparent);pointer-events:none"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div>
+          <span class="badge badge-rose" style="margin-bottom:8px;display:inline-flex">⚙ ADMIN PANEL</span>
+          <div style="font-family:var(--font-display);font-size:24px;color:#fff">Control Panel</div>
+          <div style="color:var(--muted);font-size:11px;margin-top:2px">Platform Management Dashboard</div>
+        </div>
+        <div style="position:relative">
+          <div style="width:42px;height:42px;border-radius:50%;background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.3);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer">🔔</div>
+          <div class="notif-badge">5</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-content">
+      <!-- Stats -->
+      <div class="stat-grid" style="padding-top:14px">
+        <div class="stat-box"><style>.stat-box:nth-child(1)::before{background:var(--sky)}.stat-box:nth-child(2)::before{background:var(--amber)}.stat-box:nth-child(3)::before{background:var(--emerald)}.stat-box:nth-child(4)::before{background:var(--rose)}</style>
+          <div class="stat-label">Users</div><div class="stat-value" style="font-size:16px">1,248</div><div class="stat-sub" style="color:var(--emerald)">+24 today</div>
+        </div>
+        <div class="stat-box"><div class="stat-label">Scholarships</div><div class="stat-value" style="font-size:16px">32</div><div class="stat-sub">Active</div></div>
+        <div class="stat-box"><div class="stat-label">Applications</div><div class="stat-value" style="font-size:16px">486</div><div class="stat-sub" style="color:var(--amber)">68 new</div></div>
+        <div class="stat-box"><div class="stat-label">Resources</div><div class="stat-value" style="font-size:16px">240</div><div class="stat-sub" style="color:var(--rose)">12 pending</div></div>
+      </div>
+
+      <div class="section-title">Management</div>
+
+      <div class="admin-card" onclick="">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--amber);border-radius:16px 0 0 16px"></div>
+        <div class="admin-icon" style="background:rgba(245,166,35,0.1)">🎓</div>
+        <div style="flex:1">
+          <div style="color:#fff;font-size:14px;font-weight:800">Manage Scholarships</div>
+          <div style="color:var(--muted);font-size:11px;margin-top:2px">32 active · 3 drafts</div>
+        </div>
+        <span style="color:var(--amber);font-size:22px">›</span>
+      </div>
+
+      <div class="admin-card">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--violet);border-radius:16px 0 0 16px"></div>
+        <div class="admin-icon" style="background:rgba(167,139,250,0.1)">📚</div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="color:#fff;font-size:14px;font-weight:800">Review Resources</div>
+            <span class="badge badge-rose" style="font-size:9px">12 pending</span>
+          </div>
+          <div style="color:var(--muted);font-size:11px;margin-top:2px">240 approved files</div>
+        </div>
+        <span style="color:var(--violet);font-size:22px">›</span>
+      </div>
+
+      <div class="admin-card">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--sky);border-radius:16px 0 0 16px"></div>
+        <div class="admin-icon" style="background:rgba(56,189,248,0.1)">👥</div>
+        <div style="flex:1">
+          <div style="color:#fff;font-size:14px;font-weight:800">Manage Users</div>
+          <div style="color:var(--muted);font-size:11px;margin-top:2px">1,248 students · 45 mentors</div>
+        </div>
+        <span style="color:var(--sky);font-size:22px">›</span>
+      </div>
+
+      <div class="admin-card">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--emerald);border-radius:16px 0 0 16px"></div>
+        <div class="admin-icon" style="background:rgba(52,211,153,0.1)">📊</div>
+        <div style="flex:1">
+          <div style="color:#fff;font-size:14px;font-weight:800">Generate Reports</div>
+          <div style="color:var(--muted);font-size:11px;margin-top:2px">Platform analytics & insights</div>
+        </div>
+        <span style="color:var(--emerald);font-size:22px">›</span>
+      </div>
+
+      <div class="section-title">Pending Actions</div>
+      <div style="padding:0 16px;display:flex;flex-direction:column;gap:10px;padding-bottom:16px">
+        <div class="card" style="display:flex;align-items:center;gap:10px;padding:12px 14px" id="admin-res-card">
+          <div style="width:36px;height:36px;border-radius:50%;background:rgba(251,113,133,0.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📄</div>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:12px;font-weight:700">Calculus Notes – <span id="admin-res-status">Pending Review</span></div>
+            <div style="color:var(--muted);font-size:10px">Uploaded by Ahmad · 2 hrs ago</div>
+          </div>
+          <div style="display:flex;gap:6px" id="admin-res-actions">
+            <button class="btn btn-sm" style="background:rgba(52,211,153,0.12);color:var(--emerald);border:1px solid rgba(52,211,153,0.3)" onclick="adminApproveResource()">✓</button>
+            <button class="btn btn-sm" style="background:rgba(251,113,133,0.12);color:var(--rose);border:1px solid rgba(251,113,133,0.3)" onclick="adminRejectResource()">✗</button>
+          </div>
+        </div>
+        <div class="card" style="display:flex;align-items:center;gap:10px;padding:12px 14px">
+          <div style="width:36px;height:36px;border-radius:50%;background:rgba(245,166,35,0.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🎓</div>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:12px;font-weight:700">New Applications · 5</div>
+            <div style="color:var(--muted);font-size:10px">National Merit Scholarship · today</div>
+          </div>
+          <button class="btn btn-sm" style="background:rgba(245,166,35,0.12);color:var(--amber);border:1px solid rgba(245,166,35,0.3)">Review</button>
+        </div>
+        <div class="card" style="display:flex;align-items:center;gap:10px;padding:12px 14px">
+          <div style="width:36px;height:36px;border-radius:50%;background:rgba(56,189,248,0.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">👤</div>
+          <div style="flex:1">
+            <div style="color:#fff;font-size:12px;font-weight:700">New Mentor Registration</div>
+            <div style="color:var(--muted);font-size:10px">Dr. Fatima Malik · 5 hrs ago</div>
+          </div>
+          <button class="btn btn-sm" style="background:rgba(56,189,248,0.12);color:var(--sky);border:1px solid rgba(56,189,248,0.3)">Review</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav" style="background:rgba(10,4,18,0.96);border-top:1px solid rgba(251,113,133,0.12)">
+      <div class="nav-item active"><span>📊</span><span style="color:var(--rose)">Dashboard</span></div>
+      <div class="nav-item" onclick="showScreen('scholarships')"><span>🎓</span><span>Scholarships</span></div>
+      <div class="nav-item" onclick="showScreen('resources')"><span>📚</span><span>Resources</span></div>
+      <div class="nav-item"><span>👥</span><span>Users</span></div>
+    </div>
+  </div>
+
+</div><!-- end .phone -->
+
+
+<script>
+  function switchTab(tab) { /* stub — login only has one tab */ }
+
+  /* ─── SCREEN ROUTING ─── */
+  const screenMap = {
+    'login':          'screen-login',
+    'register':       'screen-register',
+    'dashboard':      'screen-dashboard',
+    'scholarships':   'screen-scholarships',
+    'schol-detail':   'screen-schol-detail',
+    'apply':          'screen-apply',
+    'tracker':        'screen-tracker',
+    'resources':      'screen-resources',
+    'mentor':         'screen-mentor',
+    'mentor-profile': 'screen-mentor-profile',
+    'mentor-dash':    'screen-mentor-dash',
+    'admin':          'screen-admin',
+  };
+  const btnLabels = {
+    'login':'1. Login','register':'2. Register','dashboard':'3. Dashboard',
+    'scholarships':'4. Scholarships','schol-detail':'5. Details','apply':'6. Apply',
+    'tracker':'7. Tracker','resources':'8. Resources','mentor':'9. Mentor',
+    'mentor-profile':'9b. Mentor Profile','mentor-dash':'10. Mentor Dash','admin':'11. Admin',
+  };
+
+  function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById(screenMap[name]);
+    if (el) el.classList.add('active');
+    document.querySelectorAll('.screen-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.trim() === btnLabels[name]);
+    });
+    if (el) { const sc = el.querySelector('.scroll-content'); if (sc) sc.scrollTop = 0; }
+    // Reset apply screen to step 1 each time it's opened
+    if (name === 'apply') applyGoStep(1);
+  }
+
+  /* ─── TOAST SYSTEM ─── */
+  function showToast(msg, type = 'success') {
+    let toast = document.getElementById('global-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'global-toast';
+      toast.style.cssText = `
+        position:fixed; bottom:110px; left:50%; transform:translateX(-50%) translateY(20px);
+        padding:12px 20px; border-radius:14px; font-family:'DM Sans',sans-serif;
+        font-size:13px; font-weight:700; z-index:9999; max-width:320px;
+        text-align:center; opacity:0; transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+        box-shadow:0 8px 32px rgba(0,0,0,0.5); pointer-events:none;
+      `;
+      document.body.appendChild(toast);
+    }
+    const styles = {
+      success: { bg: 'rgba(10,21,37,0.96)', border: '1px solid rgba(52,211,153,0.5)', color: '#34D399' },
+      error:   { bg: 'rgba(10,21,37,0.96)', border: '1px solid rgba(251,113,133,0.5)', color: '#FB7185' },
+      info:    { bg: 'rgba(10,21,37,0.96)', border: '1px solid rgba(56,189,248,0.5)',  color: '#38BDF8' },
+    };
+    const s = styles[type] || styles.success;
+    toast.style.background = s.bg;
+    toast.style.border = s.border;
+    toast.style.color = s.color;
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(10px)';
+    }, 3000);
+  }
+
+  /* ─── TC001/TC002 · LOGIN VALIDATION ─── */
+  // Simulated user DB
+  const VALID_USERS = [
+    { email: 'ahmad@um.edu.my',   password: 'correct123', name: 'Ahmad Raheel', role: 'student' },
+    { email: 'mentor@um.edu.my',  password: 'mentor123',  name: 'Dr. Sarah Ahmed', role: 'mentor' },
+    { email: 'admin@edubridge.my',password: 'admin123',   name: 'Admin User', role: 'admin' },
+  ];
+
+  function handleLogin() {
+    const emailEl    = document.getElementById('login-email');
+    const passwordEl = document.getElementById('login-password');
+    const emailErr   = document.getElementById('login-email-err');
+    const pwErr      = document.getElementById('login-pw-err');
+
+    // reset
+    emailErr.style.display = 'none';
+    pwErr.style.display = 'none';
+    emailEl.style.borderColor = '';
+    passwordEl.style.borderColor = '';
+
+    const email    = emailEl.value.trim();
+    const password = passwordEl.value;
+
+    // basic email format check
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      emailEl.style.borderColor = 'var(--rose)';
+      emailErr.style.display = 'block';
+      return;
+    }
+
+    const user = VALID_USERS.find(u => u.email === email);
+
+    if (!user || user.password !== password) {
+      // TC002: wrong password
+      passwordEl.style.borderColor = 'var(--rose)';
+      pwErr.style.display = 'block';
+      showToast('❌ Incorrect email or password. Please try again.', 'error');
+      return;
+    }
+
+    // TC001: success – persist name
+    window._currentUser = user;
+    updateDashboardName(user.name);
+    showToast(`✅ Welcome back, ${user.name}!`, 'success');
+    setTimeout(() => {
+      if (user.role === 'mentor') showScreen('mentor-dash');
+      else if (user.role === 'admin') showScreen('admin');
+      else showScreen('dashboard');
+    }, 600);
+  }
+
+  /* ─── TC003 · REGISTER VALIDATION ─── */
+  function handleRegister() {
+    const nameEl    = document.getElementById('reg-name');
+    const emailEl   = document.getElementById('reg-email');
+    const pwEl      = document.getElementById('reg-password');
+    const confEl    = document.getElementById('reg-confirm');
+    const nameErr   = document.getElementById('reg-name-err');
+    const emailErr  = document.getElementById('reg-email-err');
+    const pwErr     = document.getElementById('reg-pw-err');
+    const confErr   = document.getElementById('reg-confirm-err');
+
+    // reset
+    [nameErr, emailErr, pwErr, confErr].forEach(e => e.style.display = 'none');
+    [nameEl, emailEl, pwEl, confEl].forEach(e => e.style.borderColor = '');
+
+    const name     = nameEl.value.trim();
+    const email    = emailEl.value.trim();
+    const pw       = pwEl.value;
+    const confirm  = confEl.value;
+    let valid = true;
+
+    if (!name) {
+      nameEl.style.borderColor = 'var(--rose)'; nameErr.style.display = 'block'; valid = false;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      emailEl.style.borderColor = 'var(--rose)'; emailErr.style.display = 'block'; valid = false;
+    }
+    // Raheel's feature: password must be ≥ 8 characters
+    if (pw.length < 8) {
+      pwEl.style.borderColor = 'var(--rose)'; pwErr.style.display = 'block'; valid = false;
+    }
+    if (pw !== confirm || !confirm) {
+      confEl.style.borderColor = 'var(--rose)'; confErr.style.display = 'block'; valid = false;
+    }
+    if (!valid) {
+      showToast('⚠ Please fix the errors above.', 'error');
+      return;
+    }
+
+    // TC003 success: persist name to dashboard
+    const role = document.getElementById('role-mentor').classList.contains('selected') ? 'mentor' : 'student';
+    window._currentUser = { name, email, password: pw, role };
+    updateDashboardName(name);
+    showToast(`✅ Account created successfully! Welcome, ${name}!`, 'success');
+    setTimeout(() => {
+      if (role === 'mentor') showScreen('mentor-dash');
+      else showScreen('dashboard');
+    }, 700);
+  }
+
+  /* ─── Raheel's feature: live password strength indicator ─── */
+  function initPasswordStrength() {
+    const pwEl = document.getElementById('reg-password');
+    if (!pwEl) return;
+
+    // inject strength bar below password field
+    const wrapper = pwEl.closest('.input-group');
+    const bar = document.createElement('div');
+    bar.id = 'pw-strength-bar';
+    bar.style.cssText = 'margin-top:6px;';
+    bar.innerHTML = `
+      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;margin-bottom:4px">
+        <div id="pw-strength-fill" style="height:100%;border-radius:4px;width:0;transition:width 0.3s,background 0.3s"></div>
+      </div>
+      <div id="pw-strength-label" style="font-size:10px;font-weight:700;color:var(--muted)"></div>
+    `;
+    wrapper.appendChild(bar);
+
+    pwEl.addEventListener('input', () => {
+      const v = pwEl.value;
+      const fill  = document.getElementById('pw-strength-fill');
+      const label = document.getElementById('pw-strength-label');
+      const errEl = document.getElementById('reg-pw-err');
+
+      // Raheel's feature: show error popup if < 8 chars and user has typed something
+      if (v.length > 0 && v.length < 8) {
+        errEl.style.display = 'block';
+        errEl.textContent = `⚠ Password too short — ${v.length}/8 characters entered.`;
+        pwEl.style.borderColor = 'var(--rose)';
+      } else if (v.length >= 8) {
+        errEl.style.display = 'none';
+        pwEl.style.borderColor = 'var(--teal)';
+      } else {
+        errEl.style.display = 'none';
+        pwEl.style.borderColor = '';
+      }
+
+      // strength calc
+      let score = 0;
+      if (v.length >= 8)  score++;
+      if (v.length >= 12) score++;
+      if (/[A-Z]/.test(v)) score++;
+      if (/[0-9]/.test(v)) score++;
+      if (/[^A-Za-z0-9]/.test(v)) score++;
+
+      const levels = [
+        { pct: '20%', color: '#FB7185', text: 'Very weak' },
+        { pct: '40%', color: '#F97316', text: 'Weak' },
+        { pct: '60%', color: '#FACC15', text: 'Fair' },
+        { pct: '80%', color: '#34D399', text: 'Strong' },
+        { pct: '100%',color: '#0EC8B0', text: 'Very strong' },
+      ];
+      const lvl = levels[Math.min(score, 4)];
+      if (v.length === 0) { fill.style.width = '0'; label.textContent = ''; return; }
+      fill.style.width   = lvl.pct;
+      fill.style.background = lvl.color;
+      label.style.color  = lvl.color;
+      label.textContent  = `Password strength: ${lvl.text}`;
+    });
+  }
+
+  /* ─── Raheel's feature: update dashboard name after register/login ─── */
+  function updateDashboardName(name) {
+    const nameEl   = document.getElementById('dash-name');
+    const letterEl = document.getElementById('dash-avatar-letter');
+    if (nameEl)   nameEl.textContent = name;
+    if (letterEl) letterEl.textContent = name.charAt(0).toUpperCase();
+  }
+
+  /* ─── TC009 · FILE UPLOAD (no validation — intentional FAIL) ─── */
+
+  // TC009 · INTENTIONAL FAIL — file type is NOT validated; all uploads accepted
+  function handleFileUpload(input) {
+    const fb = document.getElementById('upload-feedback');
+    const pendingNotice = document.getElementById('upload-pending-notice');
+    const file = input.files[0];
+    if (!file) return;
+
+    const ext = '.' + file.name.split('.').pop().toLowerCase();
+    // BUG: No file-type validation — unsupported formats are silently accepted
+    fb.style.display = 'block';
+    fb.style.background = 'rgba(52,211,153,0.08)';
+    fb.style.border = '1px solid rgba(52,211,153,0.4)';
+    fb.style.color = '#34D399';
+    fb.innerHTML = `✅ File uploaded — <b>${file.name}</b><br><span style="font-weight:400;font-size:11px">${(file.size/1024).toFixed(0)} KB · ${ext.toUpperCase().slice(1)}</span>`;
+    showToast(`✅ File uploaded: ${file.name}`, 'success');
+    // Show pending approval notice (consistent with TC012 admin review flow)
+    if (pendingNotice) pendingNotice.style.display = 'block';
+  }
+
+  /* ─── TC010 · MENTOR REQUEST ─── */
+  window._mentorRequests = {};
+
+  function handleMentorRequest(mentorName, btnEl) {
+    if (window._mentorRequests[mentorName]) {
+      showToast(`ℹ Request already sent to ${mentorName}.`, 'info');
+      return;
+    }
+    window._mentorRequests[mentorName] = true;
+    if (btnEl) {
+      btnEl.textContent = '✓ Requested';
+      btnEl.style.background = 'rgba(52,211,153,0.12)';
+      btnEl.style.color = 'var(--emerald)';
+      btnEl.style.border = '1px solid rgba(52,211,153,0.4)';
+      btnEl.disabled = true;
+    }
+    showToast(`✅ Mentorship request sent to ${mentorName}!`, 'success');
+  }
+
+  function openMentorProfile(name, role, tags, rating) {
+    document.getElementById('mp-name').textContent = name;
+    document.getElementById('mp-role').textContent = role;
+    document.getElementById('mp-rating').textContent = '⭐ ' + rating;
+    const tagsEl = document.getElementById('mp-tags');
+    tagsEl.innerHTML = tags.map(t => `<span class="badge badge-teal" style="font-size:10px">${t}</span>`).join('');
+    const reqBtn = document.getElementById('mp-request-btn');
+    if (window._mentorRequests[name]) {
+      reqBtn.textContent = '✓ Request Already Sent';
+      reqBtn.style.opacity = '0.6';
+      reqBtn.disabled = true;
+    } else {
+      reqBtn.textContent = 'SEND MENTORSHIP REQUEST →';
+      reqBtn.style.opacity = '1';
+      reqBtn.disabled = false;
+      reqBtn.onclick = () => handleMentorRequest(name, reqBtn);
+    }
+    showScreen('mentor-profile');
+  }
+
+  /* ─── TC011 · MENTOR ACCEPT / DECLINE ─── */
+  function handleMentorAccept(btn, studentName) {
+    const card = btn.closest('.request-card');
+    const badge = card.querySelector('.badge');
+    if (badge) { badge.className = 'badge badge-green'; badge.textContent = '✓ Accepted'; }
+    const actions = card.querySelector('div:last-child');
+    if (actions) actions.innerHTML = `<span class="badge badge-green" style="font-size:11px">✓ Request accepted</span>`;
+    showToast(`✅ Request from ${studentName} accepted! Status updated.`, 'success');
+  }
+
+  function handleMentorDecline(btn, studentName) {
+    const card = btn.closest('.request-card');
+    const badge = card.querySelector('.badge');
+    if (badge) { badge.className = 'badge badge-rose'; badge.textContent = '✗ Declined'; }
+    const actions = card.querySelector('div:last-child');
+    if (actions) actions.innerHTML = `<span class="badge badge-rose" style="font-size:11px">✗ Request declined</span>`;
+    showToast(`Request from ${studentName} declined.`, 'info');
+  }
+
+  /* ─── TC012 · ADMIN APPROVE / REJECT RESOURCE (intentional FAIL — approve does not update status) ─── */
+  function adminApproveResource() {
+    // BUG: Approve button clicked but status is NOT updated — TC012 intentional FAIL
+    showToast('⚠ Approve action triggered but status was not updated.', 'error');
+  }
+
+  function adminRejectResource() {
+    document.getElementById('admin-res-status').textContent = '✗ Rejected';
+    document.getElementById('admin-res-status').style.color = 'var(--rose)';
+    document.getElementById('admin-res-actions').innerHTML =
+      `<span class="badge badge-rose" style="font-size:11px">✗ Rejected</span>`;
+    showToast('Resource rejected and removed from queue.', 'info');
+  }
+
+  /* ─── ROLE SELECT ─── */
+  function toggleRole() {
+    const s = document.getElementById('role-student');
+    const m = document.getElementById('role-mentor');
+    const sActive = s.classList.contains('selected');
+    if (sActive) {
+      s.classList.remove('selected'); s.querySelector('div:nth-child(2)').style.color='var(--slate)';
+      m.classList.add('selected');   m.querySelector('div:nth-child(2)').style.color='#fff';
+    } else {
+      m.classList.remove('selected'); m.querySelector('div:nth-child(2)').style.color='var(--slate)';
+      s.classList.add('selected');   s.querySelector('div:nth-child(2)').style.color='#fff';
+    }
+  }
+  document.getElementById('role-student').addEventListener('click', function() {
+    document.getElementById('role-mentor').classList.remove('selected');
+    document.getElementById('role-mentor').querySelector('div:nth-child(2)').style.color='var(--slate)';
+    this.classList.add('selected');
+    this.querySelector('div:nth-child(2)').style.color='#fff';
+  });
+
+  /* ─── CHIP TOGGLE ─── */
+  document.querySelectorAll('.chip-row').forEach(row => {
+    row.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        row.querySelectorAll('.chip').forEach(c => c.className = c.className.replace('chip-active','chip-inactive'));
+        chip.className = chip.className.replace('chip-inactive','chip-active');
+        const scr = chip.closest('.screen');
+        if (scr && scr.id === 'screen-mentor') { chip.style.background='var(--emerald)'; chip.style.color='var(--ink)'; }
+        else if (scr && scr.id === 'screen-resources') { chip.style.background='var(--violet)'; chip.style.color='white'; }
+        else { chip.style.background='var(--teal)'; chip.style.color='var(--ink)'; }
+        row.querySelectorAll('.chip').forEach(c => { if (c !== chip) { c.style.background=''; c.style.color=''; } });
+      });
+    });
+  });
+
+  /* ─── APPLICATION MULTI-STEP FLOW ─── */
+  window._appDocs = { ic: false, transcript: true, income: false, essay: false, rec: false };
+
+  function applyGoStep(step) {
+    [1,2,3].forEach(s => {
+      const el = document.getElementById('apply-step-' + s);
+      if (el) el.style.display = s === step ? 'block' : 'none';
+    });
+
+    // Update progress bar dots & lines
+    const teal = 'var(--teal)', ink3 = 'var(--ink3)', border = 'var(--border)', inkCol = 'var(--ink)', muted = 'var(--muted)';
+    const activate = (dotId, lineId, labelId, active, done) => {
+      const dot = document.getElementById(dotId);
+      const lbl = document.getElementById(labelId);
+      if (done) {
+        dot.style.background = teal; dot.style.border = 'none';
+        dot.style.color = inkCol; dot.textContent = '✓';
+      } else if (active) {
+        dot.style.background = teal; dot.style.border = 'none';
+        dot.style.color = inkCol; dot.textContent = dotId.slice(-1);
+        lbl.style.color = teal;
+      } else {
+        dot.style.background = ink3; dot.style.border = '2px solid ' + border;
+        dot.style.color = muted; dot.textContent = dotId.slice(-1);
+        lbl.style.color = muted;
+      }
+      if (lineId) {
+        const line = document.getElementById(lineId);
+        if (line) line.style.background = (done || active) ? teal : border;
+      }
+    };
+    activate('step-dot-1','step-line-1','step-lbl-1', step===1, step>1);
+    activate('step-dot-2','step-line-2','step-lbl-2', step===2, step>2);
+    activate('step-dot-3', null,        'step-lbl-3', step===3, false);
+
+    // scroll to top
+    const sc = document.querySelector('#screen-apply .scroll-content');
+    if (sc) sc.scrollTop = 0;
+
+    updateDocSummary();
+  }
+
+  function triggerDocUpload(slotId) {
+    document.getElementById('input-' + slotId).click();
+  }
+
+  function handleDocUpload(input, slotId, label) {
+    const file = input.files[0];
+    if (!file) return;
+    const ext = file.name.split('.').pop().toLowerCase();
+    const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+
+    window._appDocs[slotId] = { name: file.name, size: sizeMB };
+
+    // Update slot UI to "uploaded" state
+    const slot = document.getElementById('slot-' + slotId);
+    slot.style.border = '1.5px solid rgba(52,211,153,0.4)';
+    slot.style.background = 'rgba(52,211,153,0.06)';
+    slot.style.cursor = 'default';
+    slot.onclick = null;
+
+    const subEl = document.getElementById('slot-' + slotId + '-sub');
+    if (subEl) { subEl.style.color = 'var(--emerald)'; subEl.textContent = `✓ ${file.name} · ${sizeMB} MB`; }
+
+    const statusEl = document.getElementById('slot-' + slotId + '-status');
+    if (statusEl) statusEl.innerHTML = `
+      <div style="display:flex;gap:6px;align-items:center">
+        <span class="badge badge-green">Done</span>
+        <span onclick="removeDoc('${slotId}')" style="color:var(--muted);font-size:16px;cursor:pointer;padding:2px 6px">✕</span>
+      </div>`;
+
+    showToast(`✅ ${label} uploaded (${sizeMB} MB)`, 'success');
+    updateDocSummary();
+  }
+
+  function removeDoc(slotId) {
+    if (slotId === 'transcript') {
+      // Reset transcript slot
+      const slot = document.getElementById('slot-transcript');
+      slot.style.border = '1.5px dashed rgba(148,163,184,0.3)';
+      slot.style.background = 'var(--ink3)';
+      slot.style.cursor = 'pointer';
+      slot.onclick = () => triggerDocUpload('transcript');
+      slot.querySelector('[style*="emerald"]').textContent = 'Tap to upload · PDF';
+      slot.querySelector('[style*="emerald"]').style.color = 'var(--muted)';
+      // Replace Done badge with upload button
+      const statusEl = slot.querySelector('.badge');
+      if (statusEl) statusEl.closest('div').innerHTML = `<span style="color:var(--muted);font-size:11px;font-weight:700;border:1px solid var(--border);padding:4px 10px;border-radius:20px">Upload</span>`;
+      // Add file input back
+      if (!document.getElementById('input-transcript')) {
+        const inp = document.createElement('input');
+        inp.id = 'input-transcript'; inp.type = 'file'; inp.style.display = 'none';
+        inp.accept = '.pdf,.jpg,.jpeg,.png';
+        inp.onchange = function() { handleDocUpload(this,'transcript','Official Transcript'); };
+        slot.appendChild(inp);
+      }
+      window._appDocs['transcript'] = false;
+    } else {
+      window._appDocs[slotId] = false;
+      // Reset generic slot
+      const slot = document.getElementById('slot-' + slotId);
+      const subEl = document.getElementById('slot-' + slotId + '-sub');
+      const statusEl = document.getElementById('slot-' + slotId + '-status');
+      slot.style.border = '1.5px dashed rgba(148,163,184,0.3)';
+      slot.style.background = 'var(--ink3)';
+      slot.style.cursor = 'pointer';
+      slot.onclick = () => triggerDocUpload(slotId);
+      if (subEl) { subEl.style.color = 'var(--muted)'; subEl.textContent = 'Tap to upload'; }
+      if (statusEl) statusEl.innerHTML = `<span style="color:var(--muted);font-size:11px;font-weight:700;border:1px solid var(--border);padding:4px 10px;border-radius:20px">Upload</span>`;
+      const fileInput = document.getElementById('input-' + slotId);
+      if (fileInput) fileInput.value = '';
+    }
+    updateDocSummary();
+  }
+
+  function updateDocSummary() {
+    const required = ['ic','transcript','income'];
+    const uploaded = required.filter(k => window._appDocs[k]);
+    const total = Object.keys(window._appDocs).filter(k => window._appDocs[k]).length;
+    const countEl = document.getElementById('doc-count');
+    const subEl   = document.getElementById('doc-summary-sub');
+    const btn     = document.getElementById('submit-app-btn');
+    if (!countEl) return;
+
+    countEl.textContent = `${uploaded.length} / ${required.length} required`;
+    countEl.style.color = uploaded.length === required.length ? 'var(--emerald)' : 'var(--teal)';
+
+    if (uploaded.length === required.length) {
+      subEl.textContent = total > required.length ? `+ ${total - required.length} optional doc(s) attached` : 'All required documents uploaded ✓';
+      subEl.style.color = 'var(--emerald)';
+      if (btn) { btn.style.opacity='1'; btn.disabled=false; }
+    } else {
+      const missing = required.filter(k => !window._appDocs[k]).map(k => ({ic:'IC',transcript:'Transcript',income:'Income Proof'}[k]));
+      subEl.textContent = `Still needed: ${missing.join(', ')}`;
+      subEl.style.color = 'var(--muted)';
+      if (btn) { btn.style.opacity='0.5'; btn.disabled=true; }
+    }
+  }
+
+  function handleSubmitApplication() {
+    const required = ['ic','transcript','income'];
+    const allUploaded = required.every(k => window._appDocs[k]);
+    if (!allUploaded) {
+      showToast('⚠ Please upload all required documents first.', 'error');
+      return;
+    }
+    showToast('✅ Application submitted successfully!', 'success');
+    setTimeout(() => showScreen('tracker'), 700);
+  }
+
+  /* ─── INIT ─── */
+  initPasswordStrength();
+</script>
+</body>
+</html>
